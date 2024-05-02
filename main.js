@@ -13,14 +13,14 @@ var light = new THREE.AmbientLight(0xffffff);
 scene.add(light);
 
 const mtlLoader = new MTLLoader()
-mtlLoader.load('/models/backpack.mtl', (materials) => {
+mtlLoader.load('/models/backpack/backpack.mtl', (materials) => {
     materials.preload()
     // loading geometry
     const objLoader = new OBJLoader()
     objLoader.setMaterials(materials)
     objLoader.load(
         // resource URL
-        '/models/backpack.obj',
+        '/models/backpack/backpack.obj',
         // called when resource is loaded
         function (object) {
             scene.add(object);
