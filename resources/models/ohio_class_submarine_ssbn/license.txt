@@ -1,0 +1,11 @@
+Model Information:
+* title:	Ohio Class Submarine SSBN
+* source:	https://sketchfab.com/3d-models/ohio-class-submarine-ssbn-c9adff3a72d7462f8f82a35459a582d2
+* author:	waelXcm (https://sketchfab.com/waelXcm)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Ohio Class Submarine SSBN" (https://sketchfab.com/3d-models/ohio-class-submarine-ssbn-c9adff3a72d7462f8f82a35459a582d2) by waelXcm (https://sketchfab.com/waelXcm) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
