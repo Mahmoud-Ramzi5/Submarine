@@ -9,11 +9,15 @@ import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 
+import Physics from './src/Physics';
+import Submarine from './src/Submarine';
+
 import { Water } from 'three/examples/jsm/Addons.js';
 import img from './resources/textures/Material.001_baseColor.jpeg';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 100, 100);
 const orthographicCamera = new THREE.OrthographicCamera(-100, 100, 100, -100, 0.1, 1000);
 scene.add(camera);
 scene.add(orthographicCamera);
@@ -34,10 +38,15 @@ ambientLight.castShadow = true;
 scene.add(ambientLight);
 
 const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(0, 100, 0);
+light.position.set(75, 175, -100);
 light.target.position.set(0, 0, 0);
 light.castShadow = true;
 scene.add(light);
+
+const LightHelper = new THREE.DirectionalLightHelper(light, 3);
+scene.add(LightHelper);
+
+
 // light.shadow.bias = -0.001;
 // light.shadow.mapSize.width = 2048;
 // light.shadow.mapSize.height = 2048;
@@ -57,19 +66,111 @@ scene.add(light);
 //     controls.movementSpeed = 5;
 // });
 
-var waterGeometry = new THREE.PlaneGeometry(1000, 1000, 200, 200);
+const clock = new THREE.Clock();
+
+// define uniform data
+const uniformData = {
+    u_time: {
+        type: 'f',
+        value: clock.getElapsedTime(),
+    },
+    texture1: {
+        type: "t",
+        value: new THREE.TextureLoader().load('/resources/textures/waternormals.jpg', function (texture) {
+            texture.format = THREE.RGBAFormat;
+            texture.magFilter = THREE.LinearFilter;
+            texture.minFilter = THREE.LinearMipMapLinearFilter;
+            texture.generateMipmaps = true;
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            texture.offset.set(0, 0);
+            texture.needsUpdate = true
+        })
+    }
+
+};
+const render = () => {
+    uniformData.u_time.value = clock.getElapsedTime();
+    window.requestAnimationFrame(render);
+};
+render();
+
+
+const box = new THREE.BoxGeometry(100, 1, 100, 100, 100, 100);
+const boxMaterial = new THREE.MeshStandardMaterial({
+    map: new THREE.TextureLoader().load('/resources/textures/waternormals.jpg', function (texture) {
+        texture.format = THREE.RGBAFormat;
+        texture.magFilter = THREE.LinearFilter;
+        texture.minFilter = THREE.LinearMipMapLinearFilter;
+        texture.generateMipmaps = true;
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.offset.set(0, 0);
+        texture.needsUpdate = true
+    }),
+});
+const GGmaterial = new THREE.ShaderMaterial({
+    wireframe: false,
+    uniforms: uniformData,
+    vertexShader: `
+    varying vec2 vUv;
+    varying vec3 pos;
+    uniform float u_time;
+
+    void main()	{
+    vUv = uv;
+
+      vec4 result;
+      pos = position;
+
+      result = vec4(
+        position.x,
+        4.0*sin(position.z/4.0 + u_time) + position.y,
+        position.z,
+        1.0
+      );
+
+      gl_Position = projectionMatrix
+        * modelViewMatrix
+        * result;
+    }
+    `,
+    fragmentShader: `
+    uniform sampler2D texture1;
+    varying vec2 vUv;
+
+    varying vec3 pos;
+    uniform float u_time;
+    void main() {
+      if (pos.x >= 0.0) {
+        // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        gl_FragColor = vec4(abs(sin(u_time)), 0.0, 0.0, 1.0);
+      } else {
+        // gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+        //gl_FragColor = vec4(0.0, abs(cos(u_time)), 0.0, 1.0);
+        gl_FragColor = texture2D(texture1, vUv);
+      }
+    }
+    `,
+});
+
+
+var waterGeometry = new THREE.PlaneGeometry(1000, 1000, 100, 100);
+
 var water = new Water(
     waterGeometry,
     {
         textureWidth: 512,
         textureHeight: 512,
         waterNormals: new THREE.TextureLoader().load('/resources/textures/waternormals.jpg', function (texture) {
-
+            texture.format = THREE.RGBAFormat;
+            texture.magFilter = THREE.LinearFilter;
+            texture.minFilter = THREE.LinearMipMapLinearFilter;
+            texture.generateMipmaps = true;
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-
+            texture.offset.set(0, 0);
+            texture.needsUpdate = true
         }),
         alpha: 1.0,
-        sunDirection: new THREE.Vector3(),
+        sunDirection: light.position.clone().normalize(),
         sunColor: 0xffffff,
         waterColor: 0x001e0f,
         distortionScale: 3.7,
@@ -78,9 +179,21 @@ var water = new Water(
     }
 );
 
+const S = new Submarine(2500000, 2800000, 73, 13, 5, 10.27, 0.04);
+console.log(S);
+console.log(S.calcArea());
+const P = new Physics();
+console.log(P.Weight(S.mass_submerged));
+
+
+
 water.rotation.x = - Math.PI / 2;
 
+var gg = new THREE.Mesh(box, GGmaterial);
+
 scene.add(water);
+
+//scene.add(water);
 
 const sceneLoader = new THREE.CubeTextureLoader();
 const texture = sceneLoader.load([
@@ -98,7 +211,7 @@ const material = new THREE.MeshBasicMaterial({
     color: '#ff0000'
 })
 
-       const GGtexture = new THREE.TextureLoader().load(img);
+const GGtexture = new THREE.TextureLoader().load(img);
 
 // Instantiate a loader
 const loader = new GLTFLoader();
@@ -117,7 +230,6 @@ loader.load(
         gltf.scene.scale.set(10, 10, 10);
         scene.add(gltf.scene);
 
-        camera.position.set(10, 15, 10);
         camera.lookAt(0, 0, 0);
 
         gltf.animations; // Array<THREE.AnimationClip>
