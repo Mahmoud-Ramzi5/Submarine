@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 export default class Physics {
     constructor(Gravity=9.81, WaterDensity=1028, AirDensity=1.293, Temperature=0) {
         this.Gravity = Gravity;
@@ -30,11 +32,15 @@ export default class Physics {
     }
 
     Weight(mass) {
-        return (mass * this.Gravity);
+        const dir = new THREE.Vector3(0, -1, 0).normalize();
+        const int = mass * this.Gravity;
+        return dir.multiplyScalar(int);
     }
 
     Buoyancy(volume) {
-        return (this.WaterDensity * this.Gravity * volume);
+        const dir = new THREE.Vector3(0, 1, 0).normalize();
+        const int = this.WaterDensity * this.Gravity * volume;
+        return dir.multiplyScalar(int);
     }
 
     Drag(area, speed, Cd) {

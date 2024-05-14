@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 export default class Submarine {
     constructor(mass, mass_submerged, length, height, radius, max_speed, Cd) {
         this.mass = mass;

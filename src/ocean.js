@@ -5,7 +5,7 @@ export default class Ocean {
     this.clock = clock;
     // Common
     this.GridSize = 200;        // Size of Grid in meters
-    this.GridRepetitions = 2;   // number of Grid repetition
+    this.GridRepetitions = 20;   // number of Grid repetition
     this.WaterColor = 0x081080; // Water (Navy)
     // Animated
     this.segments = 15;          // Segments per Grid (fewer = sharper waves)
@@ -44,6 +44,8 @@ export default class Ocean {
 
     this.matWav = new THREE.MeshStandardMaterial({
       normalMap: this.waterTexture,
+      opacity: 0.75,
+      transparent: true,
       metalness: 0.5,
       roughness: 0.6,
       side: THREE.DoubleSide,

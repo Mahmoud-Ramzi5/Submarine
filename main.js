@@ -75,12 +75,27 @@ const S = new Submarine(2500000, 2800000, 73, 13, 5, 10.27, 0.04);
 console.log(S);
 const P = new Physics();
 console.log(P);
+console.log(P.Weight(S.mass));
+
 
 /* Ocean */
 const ocean = new Ocean(sceneManager.clock);
 console.log(ocean);
 ocean.initlize(sceneManager.scene);
 ocean.animate();
+
+// const box = new THREE.BoxGeometry(5000, 1000, 5000, 200, 100, 200);
+// const boxMaterial = new THREE.MeshStandardMaterial({
+//     color: 0x0000ff,
+//     opacity: 0.5,
+//     transparent: true,
+//     side: THREE.DoubleSide
+// });
+
+// const boxMesh = new THREE.Mesh(box, boxMaterial);
+// boxMesh.position.set(0, -500, 0);
+
+// sceneManager.scene.add(boxMesh);
 
 // /* Scene water */
 // const waterGeometry = new THREE.PlaneGeometry(1000, 1000, 1, 1);
