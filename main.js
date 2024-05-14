@@ -21,17 +21,33 @@ const sceneManager = new SceneManager('Web_GL');
 sceneManager.camera.position.set(0, 100, 100);
 
 /* Load scene textures */
+
 const sceneLoader = new THREE.CubeTextureLoader();
 const sceneTexture = sceneLoader.load([
-    './resources/textures/skybox/right.jpg',
-    './resources/textures/skybox/left.jpg',
-    './resources/textures/skybox/top.jpg',
-    './resources/textures/skybox/bottom.jpg',
-    './resources/textures/skybox/front.jpg',
-    './resources/textures/skybox/back.jpg',
+'../resources/textures/skybox/right.jpg',
+'../resources/textures/skybox/left.jpg',
+'../resources/textures/skybox/top.jpg',
+'../resources/textures/skybox/bottom.jpg',
+'../resources/textures/skybox/front.jpg',
+'../resources/textures/skybox/back.jpg',
 ]);
 sceneTexture.encoding = THREE.sRGBEncoding;
-sceneManager.scene.background = sceneTexture;
+const sceneLoader2 = new THREE.CubeTextureLoader();
+const sceneTexture2 = sceneLoader2.load([
+'../resources/textures/underwater_skybox/side.jpg',
+'../resources/textures/underwater_skybox/side.jpg',
+'../resources/textures/underwater_skybox/top2.jpg',
+'../resources/textures/underwater_skybox/floor.jpg',
+'../resources/textures/underwater_skybox/side.jpg',
+'../resources/textures/underwater_skybox/side.jpg',
+]);
+sceneTexture2.encoding = THREE.sRGBEncoding;
+if (sceneManager.camera.position.y<0){
+    sceneManager.scene.background = sceneTexture;
+}else{
+    sceneManager.scene.background = sceneTexture2;
+}
+
 
 /* Init gui */
 const gui = new GUI();
@@ -50,10 +66,31 @@ gltfLoader.load(
         // });
         //const submarine = new THREE.Mesh( gltf.scene, material );
         gltf.scene.scale.set(10, 10, 10);
+        /* fixing the submarine angle */
+        gltf.scene.rotateY(1.6);
+        /* trying to make the controls*/
+        document.addEventListener("keydown", onDocumentKeyDown, false);
+        function onDocumentKeyDown(event) {
+            var keyCode = event.which;
+            if (keyCode == 87) {
+                gltf.scene.position.set(gltf.scene.position.x,gltf.scene.position.y,gltf.scene.position.z-= 2);
+            } else if (keyCode == 83) {
+                gltf.scene.position.set(gltf.scene.position.x,gltf.scene.position.y,gltf.scene.position.z+= 2);
+            } else if (keyCode == 65) {
+                gltf.scene.position.set(gltf.scene.position.x-= 2,gltf.scene.position.y,gltf.scene.position.z);
+            } else if (keyCode == 68) {
+                gltf.scene.position.set(gltf.scene.position.x+= 2,gltf.scene.position.y,gltf.scene.position.z);
+            }else if (keyCode == 49){
+                gltf.scene.position.set(gltf.scene.position.x,gltf.scene.position.y+=2,gltf.scene.position.z);
+            } else if (keyCode == 50){
+                gltf.scene.position.set(gltf.scene.position.x,gltf.scene.position.y-=2,gltf.scene.position.z);
+            }else if (keyCode == 82) {
+                gltf.scene.position.set(0, 0, 0);
+            }
+        };
         sceneManager.scene.add(gltf.scene);
-
         sceneManager.camera.lookAt(0, 0, 0);
-
+        
         gltf.animations; // Array<THREE.AnimationClip>
         gltf.scene; // THREE.Group
         gltf.scenes; // Array<THREE.Group>
