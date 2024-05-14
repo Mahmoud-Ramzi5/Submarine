@@ -24,30 +24,24 @@ sceneManager.camera.position.set(0, 100, 100);
 
 const sceneLoader = new THREE.CubeTextureLoader();
 const sceneTexture = sceneLoader.load([
-'../resources/textures/skybox/right.jpg',
-'../resources/textures/skybox/left.jpg',
-'../resources/textures/skybox/top.jpg',
-'../resources/textures/skybox/bottom.jpg',
-'../resources/textures/skybox/front.jpg',
-'../resources/textures/skybox/back.jpg',
+'./resources/textures/skybox/right.jpg',
+'./resources/textures/skybox/left.jpg',
+'./resources/textures/skybox/top.jpg',
+'./resources/textures/skybox/bottom.jpg',
+'./resources/textures/skybox/front.jpg',
+'./resources/textures/skybox/back.jpg',
 ]);
 sceneTexture.encoding = THREE.sRGBEncoding;
 const sceneLoader2 = new THREE.CubeTextureLoader();
 const sceneTexture2 = sceneLoader2.load([
-'../resources/textures/underwater_skybox/side.jpg',
-'../resources/textures/underwater_skybox/side.jpg',
-'../resources/textures/underwater_skybox/top2.jpg',
-'../resources/textures/underwater_skybox/floor.jpg',
-'../resources/textures/underwater_skybox/side.jpg',
-'../resources/textures/underwater_skybox/side.jpg',
+'./resources/textures/underwater_skybox/side.jpg',
+'./resources/textures/underwater_skybox/side.jpg',
+'./resources/textures/underwater_skybox/top2.jpg',
+'./resources/textures/underwater_skybox/floor.jpg',
+'./resources/textures/underwater_skybox/side.jpg',
+'./resources/textures/underwater_skybox/side.jpg',
 ]);
 sceneTexture2.encoding = THREE.sRGBEncoding;
-if (sceneManager.camera.position.y<0){
-    sceneManager.scene.background = sceneTexture;
-}else{
-    sceneManager.scene.background = sceneTexture2;
-}
-
 
 /* Init gui */
 const gui = new GUI();
@@ -113,7 +107,6 @@ console.log(S);
 const P = new Physics();
 console.log(P);
 console.log(P.Weight(S.mass));
-
 
 /* Ocean */
 const ocean = new Ocean(sceneManager.clock);
@@ -287,6 +280,15 @@ const GGtexture = new THREE.TextureLoader().load(img);
 //         }
 //     );
 // })
+function render() {
+    requestAnimationFrame(render);
+    if (sceneManager.camera.position.y<0){
+        sceneManager.scene.background = sceneTexture2;
+    }else{
+        sceneManager.scene.background = sceneTexture;
+    }
+}
+render();
 
 if (WebGL.isWebGLAvailable()) {
     // Initiate function or other initializations here

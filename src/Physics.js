@@ -43,11 +43,23 @@ export default class Physics {
         return dir.multiplyScalar(int);
     }
 
+    /* area = area of submarine, speed = speed of submarine and it is a vec3 */
     Drag(area, speed, Cd) {
-        return (0.5 * this.WaterDensity * (speed**2) * Cd * area);
+        const velocity = speed.length();
+        const direction = speed.clone().normalize().negate();
+        const intensity = 0.5 * this.WaterDensity * (velocity**2) * Cd * area;
+        return direction.multiplyScalar(intensity);
     }
 
     Thrust(area, start_speed, end_speed) {
-        return (this.WaterDensity * area * end_speed * (end_speed - start_speed));
+        const start_velocity = start_speed.length();
+        const end_velocity = end_speed.length();
+        const direction = end_speed.clone().normalize();
+        const intensity = this.WaterDensity * area * end_velocity * (end_velocity - start_velocity);
+        return direction.multiplyScalar(intensity);
+    }
+
+    newtonFirstLaw(){
+        
     }
 }
