@@ -9,6 +9,9 @@ export default class Submarine {
         this.radius = radius;
         this.max_speed = max_speed;
         this.Cd = Cd;
+
+
+        this.position = new THREE.Vector3(0, 0, 0);
     }
 
     getAttributes() {
@@ -43,6 +46,14 @@ export default class Submarine {
     }
     setCd(Cd) {
         this.Cd = Cd;
+    }
+
+    getPosition() {
+        return this.position;
+    }
+
+    setPosition(x, y, z) {
+        return this.position.set(x, y, z);
     }
 
     calcArea() {

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+
 export default class Physics {
     constructor(Gravity=9.81, WaterDensity=1028, AirDensity=1.293, Temperature=0) {
         this.Gravity = Gravity;
@@ -59,7 +60,29 @@ export default class Physics {
         return direction.multiplyScalar(intensity);
     }
 
-    newtonFirstLaw(){
-        
+    NewtonSecondLaw(mass, weight, buoyancy, drag, thrust) {
+        const total = new THREE.Vector3(0, 0, 0);
+        total.add(weight);
+        total.add(buoyancy);
+        total.add(drag);
+        console.log(drag);
+        total.add(thrust);
+        console.log(thrust);
+
+
+        const a = total.divideScalar(mass);
+        return a;
+    }
+
+    getAccerlationVelocity(start_velocity, accerlration, time) {
+        return accerlration.clone().multiplyScalar(time).add(start_velocity);
+    }
+
+    getPosition(start_position, velocity, time) {
+        return velocity.clone().multiplyScalar(time).add(start_position);
+    }
+
+    getDistance(start_position, end_position) {
+        return end_position.sub(start_position).length();
     }
 }
