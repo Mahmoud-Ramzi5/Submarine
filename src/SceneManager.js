@@ -45,6 +45,10 @@ export default class SceneManager {
     window.addEventListener('resize', () => this.onWindowResize(), false);
   }
 
+  getCanvas(){
+    return this.canvas;
+  }
+
   animate() {
     requestAnimationFrame(this.animate.bind(this));
     this.renderer.render(this.scene, this.camera);
