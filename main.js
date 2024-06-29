@@ -21,7 +21,6 @@ const sceneManager = new SceneManager('Web_GL');
 
 
 /* Load scene textures */
-
 const sceneLoader = new THREE.CubeTextureLoader();
 const sceneTexture = sceneLoader.load([
     './resources/textures/skybox/right.jpg',
@@ -49,27 +48,28 @@ const gui = new GUI();
 
 /* Submarine + Physics */
 const S = new Submarine(2500000, 2800000, 73, 13, 5, 10.27, 0.04);
+console.log('Submarine');
 console.log(S);
+
 const P = new Physics();
 const first_position = new THREE.Vector3(0, 0, 0);
 const last_position = new THREE.Vector3(16, 25, 60);
+
 const submarine_weight = P.Weight(S.mass);
+const submarine_submerged_weight = P.Weight(S.mass_submerged);
 const submarine_buoyancy = P.Buoyancy(S.calcVolume());
+console.log(submarine_weight)
+console.log(submarine_buoyancy)
 // const submarine_drag = P.Drag(S.calcArea(), new THREE.Vector3(0, 0, 1).normalize().multiplyScalar(S.max_speed), S.Cd);
 // const submarine_thrust = P.Thrust(4*Math.PI, new THREE.Vector3(0, 0, 1).normalize().multiplyScalar(S.max_speed), new THREE.Vector3(0, 0, 1).normalize().multiplyScalar(S.max_speed+20));
 
 const submarine_drag = P.Drag(S.calcArea(), new THREE.Vector3(0.5, 0, 0.25).normalize().multiplyScalar(S.max_speed), S.Cd);
 const submarine_thrust = P.Thrust(4 * Math.PI, new THREE.Vector3(0.5, 0, 0.25).normalize().multiplyScalar(S.max_speed), new THREE.Vector3(0.5, 0, 0.25).normalize().multiplyScalar(S.max_speed + 20));
 
-// const a = P.NewtonSecondLaw(S.mass, submarine_weight, submarine_weight.clone().negate(), submarine_drag, submarine_thrust);
-// const v = P.getAccerlationVelocity(new THREE.Vector3(0, 0, 0), a, 10);
-// const x = P.getPosition(new THREE.Vector3(0, 0, 0), v, 10);
 
-// console.log(a);
-// console.log(v);
-// console.log(x);
-
-const a = P.NewtonSecondLaw(S.mass, submarine_weight, submarine_weight.clone().negate(), submarine_drag, submarine_thrust);
+const a = P.NewtonSecondLaw(S.mass, submarine_submerged_weight, submarine_weight.clone().negate(), submarine_drag, submarine_drag.clone().negate());
+//const a = P.NewtonSecondLaw(S.mass, submarine_weight, submarine_submerged_weight.clone().negate(), submarine_drag, submarine_thrust);
+//const a = P.NewtonSecondLaw(S.mass, submarine_submerged_weight, submarine_weight.clone().negate(), submarine_drag, submarine_thrust);
 const v = P.getAccerlationVelocity(new THREE.Vector3(0, 0, 0), a, 10);
 const x = P.getPosition(new THREE.Vector3(0, 0, 0), v, 10);
 
@@ -77,10 +77,6 @@ console.log(a);
 console.log(v);
 console.log(x);
 
-
-
-console.log(P);
-console.log(P.Weight(S.mass));
 console.log(sceneManager.camera.position);
 
 let controls = new OrbitControls(sceneManager.camera, sceneManager.getCanvas());
@@ -104,11 +100,6 @@ gltfLoader.load(
     '/resources/models/edited.glb',
     // called when the resource is loaded
     function (gltf) {
-        // gltf.scene.traverse((mesh) => {
-        //     // You can also check for id / name / type here.
-        //     mesh.material = new THREE.MeshStandardMaterial({ map: GGtexture });
-        // });
-        //const submarine = new THREE.Mesh( gltf.scene, material );
         gltf.scene.scale.set(10, 10, 10);
         /* fixing the submarine angle */
         submarine_model = gltf.scene;
@@ -123,60 +114,120 @@ gltfLoader.load(
         sceneManager.directionalLight.target = submarine_model;
         sceneManager.camera.position.set(0, 5, 10);
         sceneManager.camera.lookAt(submarine_model.position.x, submarine_model.position.y, submarine_model.position.z);
-        // function gg() {
-        //     let i = 0;
-        //     requestAnimationFrame(gg);
-        //     if(i < 10) {
-        //         const step = v.z/20;
-        //         if (S.getPosition().z < x.z) {
-        //             console.log(S.getPosition().z < x.z)
 
-        //             S.setPosition(S.getPosition().x, S.getPosition().y, S.getPosition().z += step);
-        //             submarine_model.position.set(S.getPosition().x, S.getPosition().y, S.getPosition().z);
-        //             sceneManager.camera.position.z += step;
-        //             sceneManager.camera.lookAt(S.getPosition().x, S.getPosition().y, S.getPosition().z);
-        //         }
-        //         i += 0.05;
-        //     }
+        // var startTime;
+        // var duration = 2000;              // milliseconds
+
+        // function loop(currentTime) {
+        //     if (!startTime) startTime = currentTime;
+        //     var t = (currentTime - startTime) / duration;
+        //     // use t here, optionally clamp and/or add conditions
+        //     requestAnimationFrame(loop);    // provides current high-res time as argument
         // }
-        // gg();
-        let k = true;
 
-        var startTime;
-        var duration = 2000;              // milliseconds
+        var angleRadXZ = Math.atan(x.x / x.z);
+        var angleRad = angleRadXZ / 500;
+        var angleRadYZ = Math.atan(x.y / x.z);
+        console.log(angleRadYZ);
+        var angleRad2 = angleRadYZ / 1000;
+        // const stepx = (v.x) * Math.sin(angleRad);
+        // const stepz = (v.z) * Math.cos(angleRad);
+        // const stepy = (v.y) * Math.sin(angleRad2);
 
-        function loop(currentTime) {
-            if (!startTime) startTime = currentTime;
-            var t = (currentTime - startTime) / duration;
-            // use t here, optionally clamp and/or add conditions
-            requestAnimationFrame(loop);    // provides current high-res time as argument
-        }
-        var angleRad = Math.atan(x.x / x.z);
-        const stepx = (v.x ) * Math.cos(angleRad);
-        const stepz = (v.z ) * Math.cos(angleRad);
-        let i = 0;
+        let GG = 0;
+        var stepx = v.x / 50;
+        var stepy = v.y / 50;
+        var stepz = v.z / 50;
+
+        let j = 0;
+        let i = 10;
+        let k = 10;
         function gg() {
+            if (a.x == 0 && a.y == 0 && a.z == 0) {
+                return;
+            }
             requestAnimationFrame(gg);
-            if (i < 10) {
-                if (k) {
-                    //     submarine_model.rotateY(-angleRad);
-                    console.log(angleRad);
-                    console.log(stepx);
-                    console.log(stepz);
-                    k = false;
+            console.log(j);
+            if (j < 10) {
+                if (!isNaN(angleRadXZ)) {
+                    submarine_model.rotateY(angleRad);
+                    j += 0.02;
+                    if (j >= 9.98) {
+                        i = 0;
+                    }
+                } else {
+                    j = 10;
+                    i = 0;
                 }
+
+            }
+
+            if (i < 10) {
                 if (S.getPosition().z < x.z) {
                     S.setPosition(S.getPosition().x, S.getPosition().y, S.getPosition().z += stepz);
-                    submarine_model.position.set(S.getPosition().x, S.getPosition().y, S.getPosition().z);
-                    //sceneManager.camera.lookAt(S.getPosition().x, S.getPosition().y, S.getPosition().z);
+                    submarine_model.position.z += stepz;
                 }
                 if (S.getPosition().x < x.x) {
                     S.setPosition(S.getPosition().x += stepx, S.getPosition().y, S.getPosition().z);
                     submarine_model.position.x += stepx;
+                }
+                if (S.getPosition().z > x.z) {
+                    S.setPosition(S.getPosition().x, S.getPosition().y, S.getPosition().z += stepz);
+                    submarine_model.position.z += stepz;
+                }
+                if (S.getPosition().x > x.x) {
+                    S.setPosition(S.getPosition().x += stepx, S.getPosition().y, S.getPosition().z);
+                    submarine_model.position.x += stepx;
+                }
+
+                if (S.getPosition().y > x.y) {
+                    S.setPosition(S.getPosition().x, S.getPosition().y += stepy, S.getPosition().z);
+                    if (i > 2 && i < 6) {
+
+                        submarine_model.rotateX(angleRad2);
+                        submarine_model.rotateX(angleRad2);
+                    }
+                    else if (i > 5.9 & i < 6.1) {
+                        k = 0;
+                    }
+
+
+                    submarine_model.position.y += stepy;
+                    console.log(submarine_model.position.y);
+                    console.log('GG');
+                    GG += angleRad2;
+                    //console.log(angleRadYZ);
+                    //console.log(GG);
                     // gltf.scene.position.set(S.getPosition().x, S.getPosition().y, S.getPosition().z);
                     // sceneManager.camera.lookAt(S.getPosition().x, S.getPosition().y, S.getPosition().z);
                 }
-                i += 0.05;
+                if (S.getPosition().y < x.y) {
+                    S.setPosition(S.getPosition().x, S.getPosition().y += stepy, S.getPosition().z);
+                    if (i > 0 && i < 4) {
+
+                        submarine_model.rotateX(angleRad2);
+                        submarine_model.rotateX(angleRad2);
+                    }
+                    else if (i > 3.9 & i < 4.1) {
+                        k = 0;
+                    }
+
+
+                    submarine_model.position.y += stepy;
+                    console.log(submarine_model.position.y);
+                    GG += angleRad2;
+                    //console.log(angleRadYZ);
+                    //console.log(GG);
+                    // gltf.scene.position.set(S.getPosition().x, S.getPosition().y, S.getPosition().z);
+                    // sceneManager.camera.lookAt(S.getPosition().x, S.getPosition().y, S.getPosition().z);
+                }
+                i += 0.02;
+            }
+
+            if (k < 4) {
+                submarine_model.rotateX(-angleRad2);
+                submarine_model.rotateX(-angleRad2);
+                k += 0.02;
             }
         }
         gg();
@@ -209,11 +260,6 @@ function onDocumentKeyDown(event) {
     var keyCode = event.which;
     if (keyCode == 87 /* W */) {
         submarine_model.translateZ(-submarine_control_speed);
-        // const step = 2;
-        // S.setPosition(S.getPosition().x, S.getPosition().y, S.getPosition().z -= step);
-        // gltf.scene.position.set(S.getPosition().x, S.getPosition().y, S.getPosition().z);
-        // sceneManager.camera.position.z -= step;
-        // sceneManager.camera.lookAt(S.getPosition().x, S.getPosition().y, S.getPosition().z);
     } else if (keyCode == 83) {
         submarine_model.translateZ(submarine_control_speed);
     }
@@ -238,179 +284,20 @@ console.log(ocean);
 ocean.initlize(sceneManager.scene);
 ocean.animate();
 
-// const box = new THREE.BoxGeometry(5000, 1000, 5000, 200, 100, 200);
-// const boxMaterial = new THREE.MeshStandardMaterial({
-//     color: 0x0000ff,
-//     opacity: 0.5,
-//     transparent: true,
-//     side: THREE.DoubleSide
-// });
+/* Text */
+const textDiv = document.getElementById('text');
 
-// const boxMesh = new THREE.Mesh(box, boxMaterial);
-// boxMesh.position.set(0, -500, 0);
 
-// sceneManager.scene.add(boxMesh);
-
-// /* Scene water */
-// const waterGeometry = new THREE.PlaneGeometry(1000, 1000, 1, 1);
-// const waterTexture = new THREE.TextureLoader().load('/resources/textures/waternormals.jpg', function (texture) {
-//     texture.format = THREE.RGBAFormat;
-//     texture.magFilter = THREE.LinearFilter;
-//     texture.minFilter = THREE.LinearMipMapLinearFilter;
-//     texture.generateMipmaps = true;
-//     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-//     texture.offset.set(0, 0);
-//     texture.needsUpdate = true
-// });
-// const water = new Water(
-//     waterGeometry,
-//     {
-//         textureWidth: 512,
-//         textureHeight: 512,
-//         waterNormals: waterTexture,
-//         alpha: 1.0,
-//         sunDirection: sceneManager.directionalLight.position.clone().normalize(),
-//         sunColor: 0xffffff,
-//         waterColor: 0x001e0f,
-//         distortionScale: 3.7,
-//         fog: sceneManager.scene.fog !== undefined,
-//         side: THREE.DoubleSide
-//     }
-// );
-
-// /* Define uniform data */
-// const uniformData = {
-//     u_time: {
-//         type: 'f',
-//         value: sceneManager.clock.getElapsedTime(),
-//     },
-//     texture1: {
-//         type: "t",
-//         value: new THREE.TextureLoader().load('/resources/textures/waternormals.jpg', function (texture) {
-//             texture.format = THREE.RGBAFormat;
-//             texture.magFilter = THREE.LinearFilter;
-//             texture.minFilter = THREE.LinearMipMapLinearFilter;
-//             texture.generateMipmaps = true;
-//             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-//             texture.offset.set(0, 0);
-//             texture.needsUpdate = true
-//         })
-//     }
-// };
-
-// const GGmaterial = new THREE.ShaderMaterial({
-//     wireframe: false,
-//     uniforms: uniformData,
-//     vertexShader: `
-//     varying vec2 vUv;
-//     varying vec3 pos;
-//     uniform float u_time;
-
-//     void main()	{
-//     vUv = uv;
-
-//       vec4 result;
-//       pos = position;
-
-//       result = vec4(
-//         position.x,
-//         4.0*sin(position.z/4.0 + u_time) + position.y,
-//         position.z,
-//         1.0
-//       );
-
-//       gl_Position = projectionMatrix
-//         * modelViewMatrix
-//         * result;
-//     }
-//     `,
-//     fragmentShader: `
-//     uniform sampler2D texture1;
-//     varying vec2 vUv;
-
-//     varying vec3 pos;
-//     uniform float u_time;
-//     void main() {
-//       if (pos.x >= 0.0) {
-//         // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-//         gl_FragColor = vec4(abs(sin(u_time)), 0.0, 0.0, 1.0);
-//       } else {
-//         // gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
-//         //gl_FragColor = vec4(0.0, abs(cos(u_time)), 0.0, 1.0);
-//         gl_FragColor = texture2D(texture1, vUv);
-//       }
-//     }
-//     `,
-// });
-
-// water.rotation.x = - Math.PI / 2;
-// water.material = GGmaterial;
-// sceneManager.scene.add(water);
-
-//const orthographicCamera = new THREE.OrthographicCamera(-100, 100, 100, -100, 0.1, 1000);
-//scene.add(orthographicCamera);
-
-//controls.target.set(0, 0, 0);
-
-// light.shadow.bias = -0.001;
-// light.shadow.mapSize.width = 2048;
-// light.shadow.mapSize.height = 2048;
-// light.shadow.camera.near = 0.1;
-// light.shadow.camera.far = 500.0;
-// light.shadow.camera.near = 0.5;
-// light.shadow.camera.far = 500.0;
-// light.shadow.camera.left = 100;
-// light.shadow.camera.right = -100;
-// light.shadow.camera.top = 100;
-// light.shadow.camera.bottom = -100;
-
-// addEventListener("DOMContentLoaded", (event) => {
-//     controls = new FirstPersonControls(camera, renderer.domElement);
-//     controls.lookSpeed = 0.8;
-//     controls.movementSpeed = 5;
-// });
-
-// const render = () => {
-//     uniformData.u_time.value = sceneManager.clock.getElapsedTime();
-//     window.requestAnimationFrame(render);
-// };
-// render();
-
-const GGtexture = new THREE.TextureLoader().load(img);
-
-/* MTL Loader */
-// const mtlLoader = new MTLLoader()
-// mtlLoader.load('/resources/models/backpack/backpack.mtl', (materials) => {
-//     materials.preload()
-//     // loading geometry
-//     const objLoader = new OBJLoader()
-//     objLoader.setMaterials(materials)
-//     objLoader.load(
-//         // resource URL
-//         '/resources/models/backpack/backpack.obj',
-//         // called when resource is loaded
-//         function (object) {
-//             scene.add(object);
-//             camera.position.set(0, 5, 10);
-//             camera.lookAt(0, 0, 0);
-//         },
-//         // called when loading is in progresses
-//         function (xhr) {
-//             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-//         },
-//         // called when loading has errors
-//         function (error) {
-//             console.log('An error happened');
-//         }
-//     );
-// })
 function render() {
     requestAnimationFrame(render);
-    if (sceneManager.camera.position.y < 0) {
+    if (S.position.y < 0) {
         sceneManager.scene.background = sceneTexture2;
     } else {
         sceneManager.scene.background = sceneTexture;
     }
+    //water.material.uniforms['time'].value += 0.01;
+    textDiv.innerHTML = `X = ${S.position.x}, 
+Y = ${S.position.y}, Z = ${S.position.z}`
 }
 render();
 

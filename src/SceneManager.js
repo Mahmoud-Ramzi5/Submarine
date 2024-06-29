@@ -34,6 +34,19 @@ export default class SceneManager {
     // Directional light: which is illuminating the chart directly
     this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     this.directionalLight.position.set(75, 175, -100);
+
+    this.directionalLight.shadow.bias = -0.001;
+    this.directionalLight.shadow.mapSize.width = 2048;
+    this.directionalLight.shadow.mapSize.height = 2048;
+    this.directionalLight.shadow.camera.near = 0.1;
+    this.directionalLight.shadow.camera.far = 500.0;
+    this.directionalLight.shadow.camera.near = 0.5;
+    this.directionalLight.shadow.camera.far = 500.0;
+    this.directionalLight.shadow.camera.left = 100;
+    this.directionalLight.shadow.camera.right = -100;
+    this.directionalLight.shadow.camera.top = 100;
+    this.directionalLight.shadow.camera.bottom = -100;
+
     //this.directionalLight.target.position.set(0, 0, 0);
     this.directionalLight.castShadow = true;
     this.scene.add(this.directionalLight);
@@ -45,7 +58,7 @@ export default class SceneManager {
     window.addEventListener('resize', () => this.onWindowResize(), false);
   }
 
-  getCanvas(){
+  getCanvas() {
     return this.canvas;
   }
 
