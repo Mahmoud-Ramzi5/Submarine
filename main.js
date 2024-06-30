@@ -1,22 +1,25 @@
 import * as THREE from 'three';
+
 import WebGL from 'three/addons/capabilities/WebGL.js';
+import { GUI } from 'dat.gui';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
 import SceneManager from './src/SceneManager';
 import ModelLoaders from './src/ModelLoaders';
-import Ocean from './src/ocean';
-import { GUI } from 'dat.gui';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
-import Physics from './src/Physics';
 import Submarine from './src/Submarine';
+import Physics from './src/Physics';
+import Ocean from './src/ocean';
 
-import { Water } from 'three/examples/jsm/Addons.js';
-import img from './resources/textures/Material.001_baseColor.jpeg';
+
+/* Init gui */
+const gui = new GUI();
 
 /* Init scene */
 const sceneManager = new SceneManager('Web_GL');
 
 /* Init model loaders */
 const modelLoaders = new ModelLoaders();
+
 
 /* Load scene textures */
 const sceneLoader = new THREE.CubeTextureLoader();
@@ -29,6 +32,7 @@ const sceneTexture = sceneLoader.load([
     './resources/textures/skybox/back.jpg',
 ]);
 sceneTexture.encoding = THREE.sRGBEncoding;
+
 const sceneLoader2 = new THREE.CubeTextureLoader();
 const sceneTexture2 = sceneLoader2.load([
     './resources/textures/underwater_skybox/side.jpg',
@@ -40,56 +44,24 @@ const sceneTexture2 = sceneLoader2.load([
 ]);
 sceneTexture2.encoding = THREE.sRGBEncoding;
 
-/* Init gui */
-const gui = new GUI();
-
-
-/* Submarine + Physics */
-const submarine = new Submarine(2500000, 2800000, 73, 13, 5, 10.27, 0.04);
-console.log('Submarine');
-console.log(submarine);
-
-const P = new Physics();
-const first_position = new THREE.Vector3(0, 0, 0);
-const last_position = new THREE.Vector3(16, 25, 60);
-
-const submarine_weight = P.Weight(submarine.mass);
-const submarine_submerged_weight = P.Weight(submarine.mass_submerged);
-const submarine_buoyancy = P.Buoyancy(submarine.calcVolume());
-console.log(submarine_weight)
-console.log(submarine_buoyancy)
-// const submarine_drag = P.Drag(submarine.calcArea(), new THREE.Vector3(0, 0, 1).normalize().multiplyScalar(submarine.max_speed), submarine.Cd);
-// const submarine_thrust = P.Thrust(4*Math.PI, new THREE.Vector3(0, 0, 1).normalize().multiplyScalar(submarine.max_speed), new THREE.Vector3(0, 0, 1).normalize().multiplyScalar(submarine.max_speed+20));
-
-const submarine_drag = P.Drag(submarine.calcArea(), new THREE.Vector3(0.5, 0, 0.25).normalize().multiplyScalar(submarine.max_speed), submarine.Cd);
-const submarine_thrust = P.Thrust(4 * Math.PI, new THREE.Vector3(0.5, 0, 0.25).normalize().multiplyScalar(submarine.max_speed), new THREE.Vector3(0.5, 0, 0.25).normalize().multiplyScalar(submarine.max_speed + 20));
-
-
-const a = P.NewtonSecondLaw(submarine.mass, submarine_submerged_weight, submarine_weight.clone().negate(), submarine_drag, submarine_drag.clone().negate());
-//const a = P.NewtonSecondLaw(submarine.mass, submarine_weight, submarine_submerged_weight.clone().negate(), submarine_drag, submarine_thrust);
-//const a = P.NewtonSecondLaw(submarine.mass, submarine_submerged_weight, submarine_weight.clone().negate(), submarine_drag, submarine_thrust);
-const v = P.getAccerlationVelocity(new THREE.Vector3(0, 0, 0), a, 10);
-const x = P.getPosition(new THREE.Vector3(0, 0, 0), v, 10);
-
-console.log(a);
-console.log(v);
-console.log(x);
-
-console.log(sceneManager.camera.position);
-
-let controls = new OrbitControls(sceneManager.camera, sceneManager.getCanvas());
+/* OrbitControls */
+const controls = new OrbitControls(sceneManager.camera, sceneManager.getRendererDom());
 controls.enableDamping = true;
-controls.minDistance = 5;
-controls.maxDistance = 15;
+// controls.minDistance = 5;
+// controls.maxDistance = 15;
 controls.enablePan = false;
-controls.maxPolarAngle = (Math.PI / 2) - 0.05;
-controls.mouseButtons = {
-    LEFT: '', MIDDLE: '', RIGHT: '',
-};
 controls.enableZoom = false;
-
+// controls.maxPolarAngle = (Math.PI / 2) - 0.05;
 controls.update();
-/* Load submarine model */
+// controls.mouseButtons = {
+//     LEFT: '', MIDDLE: '', RIGHT: '',
+// };
+
+
+/* Submarine */
+const submarine = new Submarine(2500000, 2800000, 73, 13, 5, 10.27, 0.04);
+
+// Load submarine model
 async function loadSubmarineModel() {
     // Load a glTF resource
     const submarine_model = await modelLoaders.load_GLTF_Model('/resources/models/edited.glb');
@@ -103,14 +75,90 @@ async function loadSubmarineModel() {
         submarine.setModel(submarine_model);
 
         sceneManager.scene.add(submarine.model);
-        submarine.model.add(sceneManager.camera);
+        //submarine.model.add(sceneManager.camera);
         sceneManager.directionalLight.target = submarine.model;
-        sceneManager.camera.position.set(0, 5, 10);
-        sceneManager.camera.lookAt(submarine.getPosition().x, submarine.getPosition().y, submarine.getPosition().z);
-        moveSubmarine()
+
+        controls.target.set(
+            submarine.getPosition().x,
+            submarine.getPosition().y,
+            submarine.getPosition().z
+        );
+        sceneManager.camera.position.set(
+            submarine.getPosition().x - 10,
+            submarine.getPosition().y + 25,
+            submarine.getPosition().z + 100
+        );
+        // sceneManager.camera.lookAt(
+        //     submarine.getPosition().x,
+        //     submarine.getPosition().y,
+        //     submarine.getPosition().z
+        // );
+
+        calcPhysics();
+
     }
 }
 loadSubmarineModel();
+
+/* Physics */
+const physics = new Physics();
+function calcPhysics() {
+    const submarine_weight = physics.Weight(submarine.mass);
+    const submarine_submerged_weight = physics.Weight(submarine.mass_submerged);
+    const submarine_buoyancy = physics.Buoyancy(submarine.calcVolume());
+
+    const submarine_drag = physics.Drag(submarine.calcArea(),
+        new THREE.Vector3(0.5, 0, 0.25).normalize().multiplyScalar(submarine.max_speed), submarine.Cd);
+
+    const submarine_thrust = physics.Thrust(4 * Math.PI,
+        new THREE.Vector3(0.5, 0, 0.25).normalize().multiplyScalar(submarine.max_speed),
+        new THREE.Vector3(0.5, 0, 0.25).normalize().multiplyScalar(submarine.max_speed + 20));
+
+
+    // const submarine_drag = physics.Drag(submarine.calcArea(), 
+    //     new THREE.Vector3(0, 0, 1).normalize().multiplyScalar(submarine.max_speed), submarine.Cd);
+
+    // const submarine_thrust = physics.Thrust(4*Math.PI, 
+    //     new THREE.Vector3(0, 0, 1).normalize().multiplyScalar(submarine.max_speed), 
+    //     new THREE.Vector3(0, 0, 1).normalize().multiplyScalar(submarine.max_speed+20));
+
+
+    // const acceleration = physics.NewtonSecondLaw(
+    //     submarine.mass,
+    //     submarine_submerged_weight,
+    //     submarine_weight.clone().negate(),
+    //     submarine_drag,
+    //     submarine_drag.clone().negate()
+    // );
+    // const acceleration = physics.NewtonSecondLaw(
+    //     submarine.mass,
+    //     submarine_weight,
+    //     submarine_submerged_weight.clone().negate(),
+    //     submarine_drag,
+    //     submarine_thrust
+    // );
+    const acceleration = physics.NewtonSecondLaw(
+        submarine.mass,
+        submarine_submerged_weight,
+        submarine_weight.clone().negate(),
+        submarine_drag,
+        submarine_thrust
+    );
+    const velocity = physics.getAccerlationVelocity(new THREE.Vector3(0, 0, 0), acceleration, 10);
+    const positionCoordinates = physics.getPosition(new THREE.Vector3(0, 0, 0), velocity, 10);
+
+    console.log(acceleration);
+    console.log(velocity);
+    console.log(positionCoordinates);
+    console.log(sceneManager.camera.position);
+
+    moveSubmarine(acceleration, velocity, positionCoordinates);
+}
+const first_position = new THREE.Vector3(0, 0, 0);
+const last_position = new THREE.Vector3(16, 25, 60);
+
+
+
 
 
 // var startTime;
@@ -123,7 +171,7 @@ loadSubmarineModel();
 //     requestAnimationFrame(loop);    // provides current high-res time as argument
 // }
 
-function moveSubmarine() {
+function moveSubmarine(a, v, x) {
     var angleRadXZ = Math.atan(x.x / x.z);
     var angleRad = angleRadXZ / 500;
     var angleRadYZ = Math.atan(x.y / x.z);
@@ -149,7 +197,7 @@ function moveSubmarine() {
         console.log(j);
         if (j < 10) {
             if (!isNaN(angleRadXZ)) {
-                submarine.rotateY(angleRad);
+                submarine.rotateY(-angleRad);
                 j += 0.02;
                 if (j >= 9.98) {
                     i = 0;
@@ -221,6 +269,24 @@ function moveSubmarine() {
                 // sceneManager.camera.lookAt(submarine.getPosition().x, submarine.getPosition().y, submarine.getPosition().z);
             }
             i += 0.02;
+
+            controls.target.set(
+                submarine.getPosition().x,
+                submarine.getPosition().y,
+                submarine.getPosition().z
+            );
+            sceneManager.camera.position.set(
+                submarine.getPosition().x - 10,
+                submarine.getPosition().y + 25,
+                submarine.getPosition().z + 100
+            );
+            // sceneManager.camera.lookAt(
+            //     submarine.getPosition().x,
+            //     submarine.getPosition().y,
+            //     submarine.getPosition().z
+            // );
+
+            console.log(sceneManager.camera.position)
         }
 
         if (k < 4) {
@@ -238,7 +304,7 @@ let rotationAxis = new THREE.Vector3(0, 1, 0);
 /* trying to make the controls*/
 document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
-    console.log(P.getDistance(first_position, last_position));
+    console.log(physics.getDistance(first_position, last_position));
     console.log(submarine_model.position);
     console.log(sceneManager.scene.position);
     var keyCode = event.which;
@@ -264,8 +330,8 @@ function onDocumentKeyDown(event) {
 
 /* Ocean */
 const ocean = new Ocean(sceneManager.clock);
-console.log(ocean);
 ocean.initlize(sceneManager.scene);
+console.log(ocean);
 ocean.animate();
 
 /* GUI */
@@ -305,6 +371,7 @@ SubmarineFolder.add(submarine, 'Cd', 0, 2)
 const textDiv = document.getElementById('text');
 
 
+/* Render */
 function render() {
     requestAnimationFrame(render);
     if (submarine.position.y < 0) {
@@ -316,10 +383,11 @@ function render() {
     textDiv.innerHTML = `X = ${submarine.position.x}, 
 Y = ${submarine.position.y}, Z = ${submarine.position.z}`
     console.log(submarine.mass)
-
+    controls.update();
 }
 render();
 
+/* Compatibility */
 if (WebGL.isWebGLAvailable()) {
     // Initiate function or other initializations here
     sceneManager.animate();

@@ -1,3 +1,8 @@
+import * as THREE from 'three';
+
+import { Water } from 'three/examples/jsm/Addons.js';
+import img from './resources/textures/Material.001_baseColor.jpeg';
+
 /* Scene water */
 const waterGeometry = new THREE.PlaneGeometry(1000, 1000, 1, 1);
 const waterTexture = new THREE.TextureLoader().load('/resources/textures/waternormals.jpg', function (texture) {

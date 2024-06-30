@@ -62,6 +62,10 @@ export default class SceneManager {
     return this.canvas;
   }
 
+  getRendererDom() {
+    return this.renderer.domElement;
+  }
+
   animate() {
     requestAnimationFrame(this.animate.bind(this));
     this.renderer.render(this.scene, this.camera);
