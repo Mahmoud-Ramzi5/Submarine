@@ -1,30 +1,3 @@
-/* MTL Loader */
-// const mtlLoader = new MTLLoader()
-// mtlLoader.load('/resources/models/backpack/backpack.mtl', (materials) => {
-//     materials.preload()
-//     // loading geometry
-//     const objLoader = new OBJLoader()
-//     objLoader.setMaterials(materials)
-//     objLoader.load(
-//         // resource URL
-//         '/resources/models/backpack/backpack.obj',
-//         // called when resource is loaded
-//         function (object) {
-//             scene.add(object);
-//             camera.position.set(0, 5, 10);
-//             camera.lookAt(0, 0, 0);
-//         },
-//         // called when loading is in progresses
-//         function (xhr) {
-//             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-//         },
-//         // called when loading has errors
-//         function (error) {
-//             console.log('An error happened');
-//         }
-//     );
-// })
-
 /* Scene water */
 const waterGeometry = new THREE.PlaneGeometry(1000, 1000, 1, 1);
 const waterTexture = new THREE.TextureLoader().load('/resources/textures/waternormals.jpg', function (texture) {

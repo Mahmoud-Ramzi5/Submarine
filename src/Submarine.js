@@ -10,8 +10,8 @@ export default class Submarine {
         this.max_speed = max_speed;
         this.Cd = Cd;
 
-
         this.position = new THREE.Vector3(0, 0, 0);
+        this.model = null;
     }
 
     getAttributes() {
@@ -29,31 +29,76 @@ export default class Submarine {
     setMass(mass) {
         this.mass = mass;
     }
-    setMass(mass_submerged) {
+
+    setSubmergedMass(mass_submerged) {
         this.mass_submerged = mass_submerged;
     }
+
     setLength(length) {
         this.length = length;
     }
+
     setHeight(height) {
         this.height = height;
     }
+
     setRadius(radius) {
         this.radius = radius;
     }
+
     setMaxSpeed(max_speed) {
         this.max_speed = max_speed;
     }
+
     setCd(Cd) {
         this.Cd = Cd;
     }
+
 
     getPosition() {
         return this.position;
     }
 
     setPosition(x, y, z) {
-        return this.position.set(x, y, z);
+        this.model.position.set(x, y, z);
+        this.position.set(x, y, z);
+    }
+
+    setPositionX(x) {
+        this.model.position.x = x;
+        this.position.x = x;
+    }
+
+    setPositionY(y) {
+        this.model.position.y = y;
+        this.position.y = y;
+    }
+
+    setPositionZ(z) {
+        this.model.position.z = z;
+        this.position.z = z;
+    }
+
+
+    rotateX(angle) {
+        this.model.rotateX(angle);
+    };
+
+    rotateY(angle) {
+        this.model.rotateY(angle);
+    };
+
+    rotateZ(angle) {
+        this.model.rotateZ(angle);
+    };
+
+
+    getModel() {
+        return this.model;
+    }
+
+    setModel(model) {
+        this.model = model;
     }
 
     calcArea() {
