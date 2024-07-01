@@ -51,6 +51,38 @@ sceneManager.scene.add(water);
 
 
 
+// const first_position = new THREE.Vector3(0, 0, 0);
+// const last_position = new THREE.Vector3(16, 25, 60);
+// let submarine_control_speed = 2;
+// let rotationRad = (Math.PI / 180) * 4;
+// let rotationAxis = new THREE.Vector3(0, 1, 0);
+// /* trying to make the controls*/
+// document.addEventListener("keydown", onDocumentKeyDown, false);
+// function onDocumentKeyDown(event) {
+//     console.log(physics.getDistance(first_position, last_position));
+//     console.log(submarine_model.position);
+//     console.log(sceneManager.scene.position);
+//     var keyCode = event.which;
+//     if (keyCode == 87 /* W */) {
+//         submarine_model.translateZ(-submarine_control_speed);
+//     } else if (keyCode == 83) {
+//         submarine_model.translateZ(submarine_control_speed);
+//     }
+//     else if (keyCode == 65) {
+//         submarine_model.position.x -= submarine_control_speed;
+//         submarine_model.rotateOnAxis(rotationAxis, rotationRad);
+//     } else if (keyCode == 68) {
+//         submarine_model.position.x += submarine_control_speed;
+//         submarine_model.rotateOnAxis(rotationAxis, -rotationRad);
+//     } else if (keyCode == 49) {
+//         submarine_model.position.y += submarine_control_speed;
+//     } else if (keyCode == 50) {
+//         submarine_model.position.y -= submarine_control_speed;
+//     } else if (keyCode == 82) {
+//         submarine_model.position.set(0, 0, 0);
+//     }
+// };
+
 
 
 

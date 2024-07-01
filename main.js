@@ -10,6 +10,9 @@ import Submarine from './src/Submarine';
 import Physics from './src/Physics';
 import Ocean from './src/ocean';
 
+import SubmarineControls from './src/SubmarineControls';
+
+
 
 /* Init gui */
 const gui = new GUI();
@@ -45,15 +48,15 @@ const sceneTexture2 = sceneLoader2.load([
 sceneTexture2.encoding = THREE.sRGBEncoding;
 
 /* OrbitControls */
-const controls = new OrbitControls(sceneManager.camera, sceneManager.getRendererDom());
-controls.enableDamping = true;
-// controls.minDistance = 5;
-// controls.maxDistance = 15;
-controls.enablePan = false;
-controls.enableZoom = false;
-// controls.maxPolarAngle = (Math.PI / 2) - 0.05;
-controls.update();
-// controls.mouseButtons = {
+const orbitControls = new OrbitControls(sceneManager.camera, sceneManager.getRendererDom());
+orbitControls.enableDamping = true;
+// orbitControls.minDistance = 5;
+// orbitControls.maxDistance = 15;
+orbitControls.enablePan = false;
+orbitControls.enableZoom = false;
+// orbitControls.maxPolarAngle = (Math.PI / 2) - 0.05;
+orbitControls.update();
+// orbitControls.mouseButtons = {
 //     LEFT: '', MIDDLE: '', RIGHT: '',
 // };
 
@@ -61,6 +64,7 @@ controls.update();
 /* Submarine */
 const submarine = new Submarine(2500000, 2800000, 73, 13, 5, 10.27, 0.04);
 
+var submarineControls;
 // Load submarine model
 async function loadSubmarineModel() {
     // Load a glTF resource
@@ -78,7 +82,7 @@ async function loadSubmarineModel() {
         //submarine.model.add(sceneManager.camera);
         sceneManager.directionalLight.target = submarine.model;
 
-        controls.target.set(
+        orbitControls.target.set(
             submarine.getPosition().x,
             submarine.getPosition().y,
             submarine.getPosition().z
@@ -93,6 +97,8 @@ async function loadSubmarineModel() {
         //     submarine.getPosition().y,
         //     submarine.getPosition().z
         // );
+
+        submarineControls = new SubmarineControls(submarine, 'mixer', 'animationsMap', orbitControls, sceneManager.camera, 'Idle')
 
         calcPhysics();
 
@@ -154,12 +160,6 @@ function calcPhysics() {
 
     moveSubmarine(acceleration, velocity, positionCoordinates);
 }
-const first_position = new THREE.Vector3(0, 0, 0);
-const last_position = new THREE.Vector3(16, 25, 60);
-
-
-
-
 
 // var startTime;
 // var duration = 2000;              // milliseconds
@@ -172,16 +172,19 @@ const last_position = new THREE.Vector3(16, 25, 60);
 // }
 
 function moveSubmarine(a, v, x) {
-    var angleRadXZ = Math.atan(x.x / x.z);
+    const startPos = new THREE.Vector3(0, 0, 0);
+    startPos.copy(submarine.getPosition());
+    const MinY = -500;
+    const MaxY = 0;
+
+    var angleRadXZ = Math.atan(x.x / x.z) - Math.PI;
     var angleRad = angleRadXZ / 500;
     var angleRadYZ = Math.atan(x.y / x.z);
-    console.log(angleRadYZ);
     var angleRad2 = angleRadYZ / 1000;
     // const stepx = (v.x) * Math.sin(angleRad);
     // const stepz = (v.z) * Math.cos(angleRad);
     // const stepy = (v.y) * Math.sin(angleRad2);
 
-    let GG = 0;
     var stepx = v.x / 50;
     var stepy = v.y / 50;
     var stepz = v.z / 50;
@@ -193,11 +196,12 @@ function moveSubmarine(a, v, x) {
         if (a.x == 0 && a.y == 0 && a.z == 0) {
             return;
         }
+
         requestAnimationFrame(gg);
-        console.log(j);
+
         if (j < 10) {
             if (!isNaN(angleRadXZ)) {
-                submarine.rotateY(-angleRad);
+                submarine.rotateY(angleRad);
                 j += 0.02;
                 if (j >= 9.98) {
                     i = 0;
@@ -206,71 +210,65 @@ function moveSubmarine(a, v, x) {
                 j = 10;
                 i = 0;
             }
-
         }
 
         if (i < 10) {
-            if (submarine.getPosition().z < x.z) {
-                submarine.setPositionZ(submarine.getPosition().z += stepz);
-                //submarine_model.position.z += stepz;
-            }
-            if (submarine.getPosition().x < x.x) {
-                submarine.setPositionX(submarine.getPosition().x += stepx);
-                //submarine_model.position.x += stepx;
-            }
-            if (submarine.getPosition().z > x.z) {
-                submarine.setPositionZ(submarine.getPosition().z += stepz);
-                //submarine_model.position.z += stepz;
-            }
-            if (submarine.getPosition().x > x.x) {
-                submarine.setPositionX(submarine.getPosition().x += stepx);
-                //submarine_model.position.x += stepx;
-            }
-
-            if (submarine.getPosition().y > x.y) {
-                submarine.setPositionY(submarine.getPosition().y += stepy);
-                if (i > 2 && i < 6) {
-
-                    submarine.rotateX(angleRad2);
-                    submarine.rotateX(angleRad2);
+            if (startPos.x > x.x) {
+                if (submarine.getPosition().x > x.x) {
+                    submarine.setPositionX(submarine.getPosition().x += stepx);
                 }
-                else if (i > 5.9 & i < 6.1) {
-                    k = 0;
+            } else if (startPos.x < x.x) {
+                if (submarine.getPosition().x < x.x) {
+                    submarine.setPositionX(submarine.getPosition().x += stepx);
                 }
+            } else { }
 
+            if (startPos.z > x.z) {
+                if (submarine.getPosition().z > x.z) {
+                    submarine.setPositionZ(submarine.getPosition().z += stepz);
+                }
+            } else if (startPos.z < x.z) {
+                if (submarine.getPosition().z < x.z) {
+                    submarine.setPositionZ(submarine.getPosition().z += stepz);
+                }
+            } else { }
 
-                //submarine_model.position.y += stepy;
-                console.log(submarine.getPosition().y);
-                console.log('GG');
-                GG += angleRad2;
-                //console.log(angleRadYZ);
-                //console.log(GG);
-                // gltf.scene.position.set(submarine.getPosition().x, submarine.getPosition().y, submarine.getPosition().z);
-                // sceneManager.camera.lookAt(submarine.getPosition().x, submarine.getPosition().y, submarine.getPosition().z);
+            if (submarine.getPosition().y >= MaxY) {
+                submarine.setPositionY(MaxY);
             }
-            if (submarine.getPosition().y < x.y) {
-                submarine.setPositionY(submarine.getPosition().y += stepy);
-                if (i > 0 && i < 4) {
-
-                    submarine.rotateX(angleRad2);
-                    submarine.rotateX(angleRad2);
-                }
-                else if (i > 3.9 & i < 4.1) {
-                    k = 0;
-                }
-
-
-                //submarine_model.position.y += stepy;
-                console.log(submarine.position.y);
-                GG += angleRad2;
-                //console.log(angleRadYZ);
-                //console.log(GG);
-                // gltf.scene.position.set(submarine.getPosition().x, submarine.getPosition().y, submarine.getPosition().z);
-                // sceneManager.camera.lookAt(submarine.getPosition().x, submarine.getPosition().y, submarine.getPosition().z);
+            else if (submarine.getPosition().y <= MinY) {
+                submarine.setPositionY(MinY);
+            }
+            else {
+                if (startPos.y > x.y) {
+                    if (submarine.getPosition().y > x.y) {
+                        submarine.setPositionY(submarine.getPosition().y += stepy);
+                        if (i > 2 && i < 6) {
+                            submarine.rotateX(angleRad2);
+                            submarine.rotateX(angleRad2);
+                        }
+                        else if (i > 5.9 & i < 6.1) {
+                            k = 0;
+                        }
+                    } else {
+                        submarine.setPositionY(submarine.getPosition().y -= stepy);
+                    }
+                } else if (startPos.y < x.y) {
+                    if (submarine.getPosition().y < x.y) {
+                        submarine.setPositionY(submarine.getPosition().y += stepy);
+                        if (i > 0 && i < 4) {
+                            submarine.rotateX(angleRad2);
+                            submarine.rotateX(angleRad2);
+                        }
+                        else if (i > 3.9 & i < 4.1) {
+                            k = 0;
+                        }
+                    }
+                } else { }
             }
             i += 0.02;
 
-            controls.target.set(
+            orbitControls.target.set(
                 submarine.getPosition().x,
                 submarine.getPosition().y,
                 submarine.getPosition().z
@@ -285,8 +283,6 @@ function moveSubmarine(a, v, x) {
             //     submarine.getPosition().y,
             //     submarine.getPosition().z
             // );
-
-            console.log(sceneManager.camera.position)
         }
 
         if (k < 4) {
@@ -298,35 +294,22 @@ function moveSubmarine(a, v, x) {
     gg();
 }
 
-let submarine_control_speed = 2;
-let rotationRad = (Math.PI / 180) * 4;
-let rotationAxis = new THREE.Vector3(0, 1, 0);
-/* trying to make the controls*/
-document.addEventListener("keydown", onDocumentKeyDown, false);
-function onDocumentKeyDown(event) {
-    console.log(physics.getDistance(first_position, last_position));
-    console.log(submarine_model.position);
-    console.log(sceneManager.scene.position);
-    var keyCode = event.which;
-    if (keyCode == 87 /* W */) {
-        submarine_model.translateZ(-submarine_control_speed);
-    } else if (keyCode == 83) {
-        submarine_model.translateZ(submarine_control_speed);
-    }
-    else if (keyCode == 65) {
-        submarine_model.position.x -= submarine_control_speed;
-        submarine_model.rotateOnAxis(rotationAxis, rotationRad);
-    } else if (keyCode == 68) {
-        submarine_model.position.x += submarine_control_speed;
-        submarine_model.rotateOnAxis(rotationAxis, -rotationRad);
-    } else if (keyCode == 49) {
-        submarine_model.position.y += submarine_control_speed;
-    } else if (keyCode == 50) {
-        submarine_model.position.y -= submarine_control_speed;
-    } else if (keyCode == 82) {
-        submarine_model.position.set(0, 0, 0);
-    }
-};
+
+// CONTROL KEYS
+const keysPressed = {}
+document.addEventListener('keydown', (event) => {
+    // if (event.shiftKey && characterControls) {
+    //     characterControls.switchRunToggle()
+    // } else {
+    (keysPressed)[event.key.toLowerCase()] = true
+    console.log(event.key.toLowerCase());
+    // }
+}, false);
+
+document.addEventListener('keyup', (event) => {
+    (keysPressed)[event.key.toLowerCase()] = false
+}, false);
+
 
 /* Ocean */
 const ocean = new Ocean(sceneManager.clock);
@@ -371,6 +354,7 @@ SubmarineFolder.add(submarine, 'Cd', 0, 2)
 const textDiv = document.getElementById('text');
 
 
+const clock = new THREE.Clock();
 /* Render */
 function render() {
     requestAnimationFrame(render);
@@ -379,11 +363,15 @@ function render() {
     } else {
         sceneManager.scene.background = sceneTexture;
     }
+
+    let mixerUpdateDelta = clock.getDelta();
+    if (submarineControls) {
+        submarineControls.update(mixerUpdateDelta, keysPressed);
+    }
+    //orbitControls.update();
     //water.material.uniforms['time'].value += 0.01;
-    textDiv.innerHTML = `X = ${submarine.position.x}, 
-Y = ${submarine.position.y}, Z = ${submarine.position.z}`
-    console.log(submarine.mass)
-    controls.update();
+    textDiv.innerHTML = `X = ${submarine.position.x.toFixed(3)}, 
+Y = ${submarine.position.y.toFixed(3)}, Z = ${submarine.position.z.toFixed(3)}`
 }
 render();
 
