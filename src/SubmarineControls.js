@@ -5,8 +5,9 @@ const A = 'a'
 const S = 's'
 const D = 'd'
 const C = 'c'
+const V = 'v'
 
-const DIRECTIONS = [W, A, S, D, C]
+const DIRECTIONS = [W, A, S, D, C, V]
 
 export default class SubmarineControls {
     // Temporary Data
@@ -75,7 +76,30 @@ export default class SubmarineControls {
                 this.submarine.getPosition().z
             );
         }
-        if (directionPressed && !keysPressed[C]) {
+
+        if (keysPressed[V]) {
+            if (this.submarine.getPosition().y >= 0) {
+                this.submarine.setPositionY(this.submarine.getPosition().y = 0);
+            }
+            else if (this.submarine.getPosition().y > -30) {
+                this.submarine.setPositionY(this.submarine.getPosition().y += 10 * delta);
+                // move camera
+                this.camera.position.y += 10 * delta;
+            }
+            else {
+                this.submarine.setPositionY(this.submarine.getPosition().y += 10 * delta);
+                // move camera
+                this.camera.position.y += 10 * delta;
+            }
+            // update camera target
+            this.orbitControl.target.set(
+                this.submarine.getPosition().x,
+                this.submarine.getPosition().y,
+                this.submarine.getPosition().z
+            );
+        }
+
+        if (directionPressed && !keysPressed[C] && !keysPressed[V]) {
             // calculate towards camera direction
             var angleYCameraDirection = Math.atan2(
                 (this.camera.position.x - this.submarine.getPosition().x),

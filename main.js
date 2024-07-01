@@ -15,7 +15,7 @@ import SubmarineControls from './src/SubmarineControls';
 
 
 /* Init gui */
-const gui = new GUI();
+const gui = new GUI({ width: 350 });
 
 /* Init scene */
 const sceneManager = new SceneManager('Web_GL');
@@ -158,7 +158,7 @@ function calcPhysics() {
     console.log(positionCoordinates);
     console.log(sceneManager.camera.position);
 
-    moveSubmarine(acceleration, velocity, positionCoordinates);
+    //moveSubmarine(acceleration, velocity, positionCoordinates);
 }
 
 // var startTime;
@@ -233,10 +233,10 @@ function moveSubmarine(a, v, x) {
                 }
             } else { }
 
-            if (submarine.getPosition().y >= MaxY) {
+            if (submarine.getPosition().y > MaxY) {
                 submarine.setPositionY(MaxY);
             }
-            else if (submarine.getPosition().y <= MinY) {
+            else if (submarine.getPosition().y < MinY) {
                 submarine.setPositionY(MinY);
             }
             else {
@@ -320,11 +320,47 @@ ocean.animate();
 /* GUI */
 const PositionFolder = gui.addFolder('Position');
 PositionFolder.add(submarine.getPosition(), 'x')
-    .name('Submarine X coords').onChange((value) => submarine.setPositionX(value));
-PositionFolder.add(submarine.getPosition(), 'y')
-    .name('Submarine Y coords').onChange((value) => submarine.setPositionY(value));
+    .name('Submarine X coords').onChange((value) => {
+        submarine.setPositionX(value);
+        orbitControls.target.set(
+            submarine.getPosition().x,
+            submarine.getPosition().y,
+            submarine.getPosition().z
+        );
+        sceneManager.camera.position.set(
+            submarine.getPosition().x - 10,
+            submarine.getPosition().y + 25,
+            submarine.getPosition().z + 100
+        );
+    });
+PositionFolder.add(submarine.getPosition(), 'y', -500, 0)
+    .name('Submarine Y coords').onChange((value) => {
+        submarine.setPositionY(value);
+        orbitControls.target.set(
+            submarine.getPosition().x,
+            submarine.getPosition().y,
+            submarine.getPosition().z
+        );
+        sceneManager.camera.position.set(
+            submarine.getPosition().x - 10,
+            submarine.getPosition().y + 25,
+            submarine.getPosition().z + 100
+        );
+    });
 PositionFolder.add(submarine.getPosition(), 'z')
-    .name('Submarine Z coords').onChange((value) => submarine.setPositionZ(value));
+    .name('Submarine Z coords').onChange((value) => {
+        submarine.setPositionZ(value);
+        orbitControls.target.set(
+            submarine.getPosition().x,
+            submarine.getPosition().y,
+            submarine.getPosition().z
+        );
+        sceneManager.camera.position.set(
+            submarine.getPosition().x - 10,
+            submarine.getPosition().y + 25,
+            submarine.getPosition().z + 100
+        );
+    });
 PositionFolder.open();
 
 const SubmarineFolder = gui.addFolder('Submarine');
@@ -349,6 +385,21 @@ SubmarineFolder.add(submarine, 'max_speed', 0, 20)
 SubmarineFolder.add(submarine, 'Cd', 0, 2)
     .name('Drag Coefficient').onChange((value) => submarine.setCd(value));
 
+const PhysicsFolder = gui.addFolder('Physics');
+PhysicsFolder.add(physics, 'Gravity', 0, 20)
+    .name('Gravity').onChange((value) => physics.setGravity(value));
+
+PhysicsFolder.add(physics, 'WaterDensity', 0, 2000)
+    .name('WaterDensity').onChange((value) => physics.setWaterDensity(value));
+
+PhysicsFolder.add(physics, 'AirDensity', 0, 2)
+    .name('AirDensity').onChange((value) => physics.setAirDensity(value));
+
+// PhysicsFolder.add(physics, 'Temperature', -100, 100)
+//     .name('Temperature').onChange((value) => physics.setTemperature(value));
+
+const MovementFolder = gui.addFolder('MovementFolder');
+MovementFolder.add();
 
 /* Text */
 const textDiv = document.getElementById('text');
@@ -368,7 +419,7 @@ function render() {
     if (submarineControls) {
         submarineControls.update(mixerUpdateDelta, keysPressed);
     }
-    //orbitControls.update();
+    orbitControls.update();
     //water.material.uniforms['time'].value += 0.01;
     textDiv.innerHTML = `X = ${submarine.position.x.toFixed(3)}, 
 Y = ${submarine.position.y.toFixed(3)}, Z = ${submarine.position.z.toFixed(3)}`
