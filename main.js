@@ -62,6 +62,7 @@ orbitControls.update();
 
 
 /* Submarine */
+const SpeedVec = new THREE.Vector3(0, 0, 0);
 const submarine = new Submarine(2500000, 2800000, 73, 13, 5, 10.27, 0.04);
 
 var submarineControls;
@@ -100,7 +101,7 @@ async function loadSubmarineModel() {
 
         submarineControls = new SubmarineControls(submarine, 'mixer', 'animationsMap', orbitControls, sceneManager.camera, 'Idle')
 
-        calcPhysics();
+        //calcPhysics();
 
     }
 }
@@ -113,13 +114,12 @@ function calcPhysics() {
     const submarine_submerged_weight = physics.Weight(submarine.mass_submerged);
     const submarine_buoyancy = physics.Buoyancy(submarine.calcVolume());
 
-    const submarine_drag = physics.Drag(submarine.calcArea(),
-        new THREE.Vector3(0.5, 0, 0.25).normalize().multiplyScalar(submarine.max_speed), submarine.Cd);
+    const submarine_drag = physics.Drag(submarine.calcArea(), submarine.Cd,
+        SpeedVec.clone().normalize().multiplyScalar(submarine.max_speed));
 
     const submarine_thrust = physics.Thrust(4 * Math.PI,
-        new THREE.Vector3(0.5, 0, 0.25).normalize().multiplyScalar(submarine.max_speed),
-        new THREE.Vector3(0.5, 0, 0.25).normalize().multiplyScalar(submarine.max_speed + 20));
-
+        SpeedVec.clone().normalize().multiplyScalar(submarine.max_speed),
+        SpeedVec.clone().normalize().multiplyScalar(submarine.max_speed + 20));
 
     // const submarine_drag = physics.Drag(submarine.calcArea(), 
     //     new THREE.Vector3(0, 0, 1).normalize().multiplyScalar(submarine.max_speed), submarine.Cd);
@@ -143,6 +143,10 @@ function calcPhysics() {
     //     submarine_drag,
     //     submarine_thrust
     // );
+
+    const startPosition = new THREE.Vector3(0, 0, 0);
+    startPosition.set(submarine.getPosition().x, submarine.getPosition().y, submarine.getPosition().z);
+
     const acceleration = physics.NewtonSecondLaw(
         submarine.mass,
         submarine_submerged_weight,
@@ -150,15 +154,15 @@ function calcPhysics() {
         submarine_drag,
         submarine_thrust
     );
-    const velocity = physics.getAccerlationVelocity(new THREE.Vector3(0, 0, 0), acceleration, 10);
-    const positionCoordinates = physics.getPosition(new THREE.Vector3(0, 0, 0), velocity, 10);
+    const velocity = physics.getAccerlationVelocity(new THREE.Vector3(0, 0, 0), acceleration);
+    const positionCoordinates = physics.getPosition(startPosition, velocity);
 
     console.log(acceleration);
     console.log(velocity);
     console.log(positionCoordinates);
     console.log(sceneManager.camera.position);
 
-    //moveSubmarine(acceleration, velocity, positionCoordinates);
+    moveSubmarine(startPosition, acceleration, velocity, positionCoordinates);
 }
 
 // var startTime;
@@ -171,27 +175,26 @@ function calcPhysics() {
 //     requestAnimationFrame(loop);    // provides current high-res time as argument
 // }
 
-function moveSubmarine(a, v, x) {
-    const startPos = new THREE.Vector3(0, 0, 0);
-    startPos.copy(submarine.getPosition());
-    const MinY = -500;
+function moveSubmarine(sPos, a, v, x) {
+    const MinY = -1000;
     const MaxY = 0;
 
+    var startRadXZ = Math.atan(sPos.x / sPos.z) - Math.PI;
     var angleRadXZ = Math.atan(x.x / x.z) - Math.PI;
-    var angleRad = angleRadXZ / 500;
+    var angleRad = angleRadXZ / 1000;
     var angleRadYZ = Math.atan(x.y / x.z);
-    var angleRad2 = angleRadYZ / 1000;
+    var angleRad2 = angleRadYZ / 2000;
     // const stepx = (v.x) * Math.sin(angleRad);
     // const stepz = (v.z) * Math.cos(angleRad);
     // const stepy = (v.y) * Math.sin(angleRad2);
 
-    var stepx = v.x / 50;
-    var stepy = v.y / 50;
-    var stepz = v.z / 50;
+    var stepx = v.x / 100;
+    var stepy = v.y / 100;
+    var stepz = v.z / 100;
 
     let j = 0;
-    let i = 10;
-    let k = 10;
+    let i = physics.getTime();
+    let k = physics.getTime();
     function gg() {
         if (a.x == 0 && a.y == 0 && a.z == 0) {
             return;
@@ -199,35 +202,40 @@ function moveSubmarine(a, v, x) {
 
         requestAnimationFrame(gg);
 
-        if (j < 10) {
+        if (j < physics.getTime()) {
             if (!isNaN(angleRadXZ)) {
-                submarine.rotateY(angleRad);
-                j += 0.02;
-                if (j >= 9.98) {
+                if (Math.ceil(startRadXZ) != Math.ceil(angleRadXZ)) {
+                    submarine.rotateY(angleRad);
+                    j += 0.01;
+                    if (j >= physics.getTime() - 0.01) {
+                        i = 0;
+                    }
+                } else {
+                    j = physics.getTime();
                     i = 0;
                 }
             } else {
-                j = 10;
+                j = physics.getTime();
                 i = 0;
             }
         }
 
-        if (i < 10) {
-            if (startPos.x > x.x) {
+        if (i < physics.getTime()) {
+            if (sPos.x > x.x) {
                 if (submarine.getPosition().x > x.x) {
                     submarine.setPositionX(submarine.getPosition().x += stepx);
                 }
-            } else if (startPos.x < x.x) {
+            } else if (sPos.x < x.x) {
                 if (submarine.getPosition().x < x.x) {
                     submarine.setPositionX(submarine.getPosition().x += stepx);
                 }
             } else { }
 
-            if (startPos.z > x.z) {
+            if (sPos.z > x.z) {
                 if (submarine.getPosition().z > x.z) {
                     submarine.setPositionZ(submarine.getPosition().z += stepz);
                 }
-            } else if (startPos.z < x.z) {
+            } else if (sPos.z < x.z) {
                 if (submarine.getPosition().z < x.z) {
                     submarine.setPositionZ(submarine.getPosition().z += stepz);
                 }
@@ -240,33 +248,33 @@ function moveSubmarine(a, v, x) {
                 submarine.setPositionY(MinY);
             }
             else {
-                if (startPos.y > x.y) {
+                if (sPos.y > x.y) {
                     if (submarine.getPosition().y > x.y) {
                         submarine.setPositionY(submarine.getPosition().y += stepy);
-                        if (i > 2 && i < 6) {
+                        if (i > physics.getTime() * 0.2 && i < physics.getTime() * 0.6) {
                             submarine.rotateX(angleRad2);
                             submarine.rotateX(angleRad2);
                         }
-                        else if (i > 5.9 & i < 6.1) {
+                        else if (i > physics.getTime() * 0.59 & i < physics.getTime() * 0.61) {
                             k = 0;
                         }
                     } else {
                         submarine.setPositionY(submarine.getPosition().y -= stepy);
                     }
-                } else if (startPos.y < x.y) {
+                } else if (sPos.y < x.y) {
                     if (submarine.getPosition().y < x.y) {
                         submarine.setPositionY(submarine.getPosition().y += stepy);
-                        if (i > 0 && i < 4) {
+                        if (i > 0 && i < physics.getTime() * 0.4) {
                             submarine.rotateX(angleRad2);
                             submarine.rotateX(angleRad2);
                         }
-                        else if (i > 3.9 & i < 4.1) {
+                        else if (i > physics.getTime() * 0.39 & i < physics.getTime() * 0.41) {
                             k = 0;
                         }
                     }
                 } else { }
             }
-            i += 0.02;
+            i += 0.01;
 
             orbitControls.target.set(
                 submarine.getPosition().x,
@@ -285,10 +293,10 @@ function moveSubmarine(a, v, x) {
             // );
         }
 
-        if (k < 4) {
+        if (k < physics.getTime() * 0.4) {
             submarine.rotateX(-angleRad2);
             submarine.rotateX(-angleRad2);
-            k += 0.02;
+            k += 0.01;
         }
     }
     gg();
@@ -318,9 +326,48 @@ console.log(ocean);
 ocean.animate();
 
 /* GUI */
-const PositionFolder = gui.addFolder('Position');
-PositionFolder.add(submarine.getPosition(), 'x')
-    .name('Submarine X coords').onChange((value) => {
+const SubmarineFolder = gui.addFolder('Submarine');
+SubmarineFolder.add(submarine, 'mass', 0, 100000000, 1000)
+    .name('Surfaced mass').onChange((value) => submarine.setMass(value));
+
+SubmarineFolder.add(submarine, 'mass_submerged', 0, 100000000, 1000)
+    .name('Submerged mass').onChange((value) => submarine.setSubmergedMass(value));
+
+SubmarineFolder.add(submarine, 'length', 0, 200, 1)
+    .name('Length').onChange((value) => submarine.setLength(value));
+
+SubmarineFolder.add(submarine, 'height', 0, 20, 1)
+    .name('Height').onChange((value) => submarine.setHeight(value));
+
+SubmarineFolder.add(submarine, 'radius', 0, 20, 0.5)
+    .name('Radius').onChange((value) => submarine.setRadius(value));
+
+SubmarineFolder.add(submarine, 'max_speed', 0, 20, 0.5)
+    .name('Max Speed').onChange((value) => submarine.setMaxSpeed(value));
+
+SubmarineFolder.add(submarine, 'Cd', 0, 2, 0.01)
+    .name('Drag Coefficient').onChange((value) => submarine.setCd(value));
+
+const PhysicsFolder = gui.addFolder('Physics');
+PhysicsFolder.add(physics, 'Gravity', 0, 20, 0.01)
+    .name('Gravity').onChange((value) => physics.setGravity(value));
+
+PhysicsFolder.add(physics, 'WaterDensity', 0, 2000, 10)
+    .name('WaterDensity').onChange((value) => physics.setWaterDensity(value));
+
+PhysicsFolder.add(physics, 'AirDensity', 0, 2, 0.01)
+    .name('AirDensity').onChange((value) => physics.setAirDensity(value));
+
+// PhysicsFolder.add(physics, 'Temperature', -100, 100)
+//     .name('Temperature').onChange((value) => physics.setTemperature(value));
+
+
+const MovementFolder = gui.addFolder('Movement Folder');
+MovementFolder.add(physics, 'Time', 0, 86400, 1)
+    .name('Time').onChange((value) => physics.setTime(value));
+
+MovementFolder.add(submarine.getPosition(), 'x')
+    .name('Submarine start X coords').onChange((value) => {
         submarine.setPositionX(value);
         orbitControls.target.set(
             submarine.getPosition().x,
@@ -333,8 +380,9 @@ PositionFolder.add(submarine.getPosition(), 'x')
             submarine.getPosition().z + 100
         );
     });
-PositionFolder.add(submarine.getPosition(), 'y', -500, 0)
-    .name('Submarine Y coords').onChange((value) => {
+
+MovementFolder.add(submarine.getPosition(), 'y', -1000, 0)
+    .name('Submarine start Y coords').onChange((value) => {
         submarine.setPositionY(value);
         orbitControls.target.set(
             submarine.getPosition().x,
@@ -347,8 +395,9 @@ PositionFolder.add(submarine.getPosition(), 'y', -500, 0)
             submarine.getPosition().z + 100
         );
     });
-PositionFolder.add(submarine.getPosition(), 'z')
-    .name('Submarine Z coords').onChange((value) => {
+
+MovementFolder.add(submarine.getPosition(), 'z')
+    .name('Submarine start Z coords').onChange((value) => {
         submarine.setPositionZ(value);
         orbitControls.target.set(
             submarine.getPosition().x,
@@ -361,45 +410,19 @@ PositionFolder.add(submarine.getPosition(), 'z')
             submarine.getPosition().z + 100
         );
     });
-PositionFolder.open();
 
-const SubmarineFolder = gui.addFolder('Submarine');
-SubmarineFolder.add(submarine, 'mass', 0, 100000000)
-    .name('Surfaced mass').onChange((value) => submarine.setMass(value));
+MovementFolder.add(SpeedVec, 'x', -1, 1, 0.01)
+    .name('Speed Vector X coords').onChange((value) => SpeedVec.setX(value));
 
-SubmarineFolder.add(submarine, 'mass_submerged', 0, 100000000)
-    .name('Submerged mass').onChange((value) => submarine.setSubmergedMass(value));
+MovementFolder.add(SpeedVec, 'y', -1, 1, 0.01)
+    .name('Speed Vector Y coords').onChange((value) => SpeedVec.setY(value));
 
-SubmarineFolder.add(submarine, 'length', 0, 200)
-    .name('Length').onChange((value) => submarine.setLength(value));
+MovementFolder.add(SpeedVec, 'z', -1, 1, 0.01)
+    .name('Speed Vector Z coords').onChange((value) => SpeedVec.setZ(value));
 
-SubmarineFolder.add(submarine, 'height', 0, 20)
-    .name('Height').onChange((value) => submarine.setHeight(value));
+var obj = { calcPhysics };
+MovementFolder.add(obj, 'calcPhysics').name('Start Movement');
 
-SubmarineFolder.add(submarine, 'radius', 0, 20)
-    .name('Radius').onChange((value) => submarine.setRadius(value));
-
-SubmarineFolder.add(submarine, 'max_speed', 0, 20)
-    .name('Max Speed').onChange((value) => submarine.setMaxSpeed(value));
-
-SubmarineFolder.add(submarine, 'Cd', 0, 2)
-    .name('Drag Coefficient').onChange((value) => submarine.setCd(value));
-
-const PhysicsFolder = gui.addFolder('Physics');
-PhysicsFolder.add(physics, 'Gravity', 0, 20)
-    .name('Gravity').onChange((value) => physics.setGravity(value));
-
-PhysicsFolder.add(physics, 'WaterDensity', 0, 2000)
-    .name('WaterDensity').onChange((value) => physics.setWaterDensity(value));
-
-PhysicsFolder.add(physics, 'AirDensity', 0, 2)
-    .name('AirDensity').onChange((value) => physics.setAirDensity(value));
-
-// PhysicsFolder.add(physics, 'Temperature', -100, 100)
-//     .name('Temperature').onChange((value) => physics.setTemperature(value));
-
-const MovementFolder = gui.addFolder('MovementFolder');
-MovementFolder.add();
 
 /* Text */
 const textDiv = document.getElementById('text');
