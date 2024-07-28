@@ -12,6 +12,8 @@ export default class Submarine {
 
         this.position = new THREE.Vector3(0, 0, 0);
         this.model = null;
+        this.steer_angle_X_Z = 0;
+        this.steer_angle_XZ_Y = 0;
     }
 
     getAttributes() {
@@ -101,11 +103,29 @@ export default class Submarine {
         this.model = model;
     }
 
+
+    getSteerAngleXZ() {
+        return this.steer_angle_X_Z;
+    }
+
+    setSteerAngleXZ(angle) {
+        this.steer_angle_X_Z = angle;
+    }
+
+    getSteerAngleXZY() {
+        return this.steer_angle_XZ_Y;
+    }
+
+    setSteerAngleXZY(angle) {
+        this.steer_angle_XZ_Y = angle;
+    }
+
+
     calcArea() {
-        return ((2 * Math.PI * this.radius * this.length) + (2 * Math.PI * (this.radius**2)));
+        return ((2 * Math.PI * this.radius * this.length) + (2 * Math.PI * (this.radius ** 2)));
     }
 
     calcVolume() {
-        return (Math.PI * (this.radius**2) * this.length);
+        return (Math.PI * (this.radius ** 2) * this.length);
     }
 }

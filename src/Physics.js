@@ -2,23 +2,23 @@ import * as THREE from 'three';
 
 
 export default class Physics {
-    constructor(Gravity=9.81, WaterDensity=1028, AirDensity=1.293, Temperature=0) {
+    constructor(Gravity = 9.81, WaterDensity = 1028, AirDensity = 1.293, Temperature = 0) {
         this.Gravity = Gravity;
         this.WaterDensity = WaterDensity;
         this.AirDensity = AirDensity;
 
         this.Time = 0;
     };
-    
-    setGravity(Gravity=9.81) {
+
+    setGravity(Gravity = 9.81) {
         this.Gravity = Gravity;
     }
 
-    setWaterDensity(WaterDensity=1028) {
+    setWaterDensity(WaterDensity = 1028) {
         this.WaterDensity = WaterDensity;
     }
 
-    setAirDensity(AirDensity=1.293) {
+    setAirDensity(AirDensity = 1.293) {
         this.AirDensity = AirDensity;
     }
 
@@ -60,7 +60,7 @@ export default class Physics {
     Drag(area, Cd, speed) {
         const velocity = speed.length();
         const direction = speed.clone().normalize().negate();
-        const intensity = 0.5 * this.WaterDensity * (velocity**2) * Cd * area;
+        const intensity = 0.5 * this.WaterDensity * (velocity ** 2) * Cd * area;
         return direction.multiplyScalar(intensity);
     }
 

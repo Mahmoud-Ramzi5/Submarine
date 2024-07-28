@@ -145,6 +145,7 @@ function calcPhysics() {
     // );
 
     const startPosition = new THREE.Vector3(0, 0, 0);
+    const startVelocity = new THREE.Vector3(0, 0, -1);
     startPosition.set(submarine.getPosition().x, submarine.getPosition().y, submarine.getPosition().z);
 
     const acceleration = physics.NewtonSecondLaw(
@@ -154,15 +155,15 @@ function calcPhysics() {
         submarine_drag,
         submarine_thrust
     );
-    const velocity = physics.getAccerlationVelocity(new THREE.Vector3(0, 0, 0), acceleration);
+
+    const velocity = physics.getAccerlationVelocity(startVelocity, acceleration);
     const positionCoordinates = physics.getPosition(startPosition, velocity);
 
     console.log(acceleration);
-    console.log(velocity);
     console.log(positionCoordinates);
     console.log(sceneManager.camera.position);
 
-    moveSubmarine(startPosition, acceleration, velocity, positionCoordinates);
+    moveSubmarine(startPosition, startVelocity, acceleration, velocity, positionCoordinates);
 }
 
 // var startTime;
@@ -174,19 +175,38 @@ function calcPhysics() {
 //     // use t here, optionally clamp and/or add conditions
 //     requestAnimationFrame(loop);    // provides current high-res time as argument
 // }
-
-function moveSubmarine(sPos, a, v, x) {
+function moveSubmarine(sPos, sV, a, v, x) {
     const MinY = -1000;
     const MaxY = 0;
 
-    var startRadXZ = Math.atan(sPos.x / sPos.z) - Math.PI;
-    var angleRadXZ = Math.atan(x.x / x.z) - Math.PI;
-    var angleRad = angleRadXZ / 1000;
+    var sV2 = sV.clone();
+    var v2 = v.clone();
+
+    var startRadXZ0 = Math.atan2(sV2.x, sV2.z);
+    var startRadXZ1 = Math.atan2(v2.x, v2.z);
+
+    // var startRadXZ = Math.atan(sPos.x / sPos.z) - Math.PI;
+    // var angleRadXZ = Math.atan(x.x / x.z);
+    // if (angleRadXZ > 0) {
+    //     angleRadXZ = Math.atan(x.x / x.z) - Math.PI;
+    // } else {
+    //     angleRadXZ = Math.atan(x.x / x.z) + Math.PI;
+    // }
+
+    var angleRad, angleRadXZ = startRadXZ1 - startRadXZ0;
+    if (angleRadXZ > 3.14) {
+        angleRadXZ = Math.atan(x.x / x.z) - Math.PI;
+    } else if (angleRadXZ < -3.14) {
+        angleRadXZ = Math.atan(x.x / x.z) + Math.PI;
+    } else { }
+
+    if (angleRadXZ < -1.5 || angleRadXZ > 1.5) {
+        angleRad = angleRadXZ / 1000;
+    } else {
+        angleRad = angleRadXZ / 1000;
+    }
     var angleRadYZ = Math.atan(x.y / x.z);
     var angleRad2 = angleRadYZ / 2000;
-    // const stepx = (v.x) * Math.sin(angleRad);
-    // const stepz = (v.z) * Math.cos(angleRad);
-    // const stepy = (v.y) * Math.sin(angleRad2);
 
     var stepx = v.x / 100;
     var stepy = v.y / 100;
@@ -195,31 +215,55 @@ function moveSubmarine(sPos, a, v, x) {
     let j = 0;
     let i = physics.getTime();
     let k = physics.getTime();
-    function gg() {
-        if (a.x == 0 && a.y == 0 && a.z == 0) {
-            return;
-        }
 
-        requestAnimationFrame(gg);
-
-        if (j < physics.getTime()) {
-            if (!isNaN(angleRadXZ)) {
-                if (Math.ceil(startRadXZ) != Math.ceil(angleRadXZ)) {
-                    submarine.rotateY(angleRad);
-                    j += 0.01;
-                    if (j >= physics.getTime() - 0.01) {
+    function rotate() {
+        requestAnimationFrame(rotate);
+        if (angleRadXZ < -1.5 || angleRadXZ > 1.5) {
+            if (j < 10) {
+                if (!isNaN(angleRadXZ)) {
+                    if (Math.ceil(startRadXZ0) != Math.ceil(startRadXZ1)) {
+                        submarine.rotateY(angleRad);
+                        j += 0.01;
+                        if (j >= 10 - 0.01) {
+                            i = 0;
+                        }
+                    } else {
+                        j = 10;
                         i = 0;
                     }
                 } else {
-                    j = physics.getTime();
+                    j = 10;
                     i = 0;
                 }
-            } else {
-                j = physics.getTime();
-                i = 0;
+            }
+        } else {
+            if (j < 10) {
+                if (!isNaN(angleRadXZ)) {
+                    if (Math.ceil(startRadXZ0) != Math.ceil(startRadXZ1)) {
+                        submarine.rotateY(angleRad);
+                        j += 0.01;
+                        if (j >= 10 - 0.01) {
+                            i = 0;
+                        }
+                    } else {
+                        j = 10;
+                        i = 0;
+                    }
+                } else {
+                    j = 10;
+                    i = 0;
+                }
             }
         }
+    }
 
+    rotate();
+
+    function move() {
+        if (a.x == 0 && a.y == 0 && a.z == 0) {
+            return;
+        }
+        requestAnimationFrame(move);
         if (i < physics.getTime()) {
             if (sPos.x > x.x) {
                 if (submarine.getPosition().x > x.x) {
@@ -281,11 +325,11 @@ function moveSubmarine(sPos, a, v, x) {
                 submarine.getPosition().y,
                 submarine.getPosition().z
             );
-            sceneManager.camera.position.set(
-                submarine.getPosition().x - 10,
-                submarine.getPosition().y + 25,
-                submarine.getPosition().z + 100
-            );
+            // sceneManager.camera.position.set(
+            //     submarine.getPosition().x - 10,
+            //     submarine.getPosition().y + 25,
+            //     submarine.getPosition().z + 100
+            // );
             // sceneManager.camera.lookAt(
             //     submarine.getPosition().x,
             //     submarine.getPosition().y,
@@ -299,7 +343,7 @@ function moveSubmarine(sPos, a, v, x) {
             k += 0.01;
         }
     }
-    gg();
+    move();
 }
 
 
@@ -419,6 +463,19 @@ MovementFolder.add(SpeedVec, 'y', -1, 1, 0.01)
 
 MovementFolder.add(SpeedVec, 'z', -1, 1, 0.01)
     .name('Speed Vector Z coords').onChange((value) => SpeedVec.setZ(value));
+
+
+// var GG = new function () {
+//     this.steer_angle = submarine.getSteerAngleXZ();
+// }
+
+// MovementFolder.add(GG, 'steer_angle', -180, 180, 1)
+//     .name('Steering Angle').onChange((value) => {
+//         GG.steer_angle = value;
+//         submarine.setSteerAngleXZ(degToRad(GG.steer_angle));
+//         submarine.rotateY(submarine.getSteerAngleXZ());
+//     });
+
 
 var obj = { calcPhysics };
 MovementFolder.add(obj, 'calcPhysics').name('Start Movement');
