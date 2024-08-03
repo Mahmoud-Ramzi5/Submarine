@@ -30,7 +30,7 @@ export default class SubmarineControls {
         this.updateCameraTarget(0, 0)
     }
 
-    update(delta, keysPressed) {
+    update(delta, keysPressed, cubeCollision, sphereCollision) {
         const directionPressed = DIRECTIONS.some(key => keysPressed[key] == true);
 
         // var play = '';
@@ -58,14 +58,17 @@ export default class SubmarineControls {
         if (keysPressed[C]) {
             if (this.submarine.getPosition().y <= -500) {
                 this.submarine.setPositionY(this.submarine.getPosition().y = -500);
+                this.submarine.setCubePositionY();
             }
             else if (this.submarine.getPosition().y > -30) {
                 this.submarine.setPositionY(this.submarine.getPosition().y -= 10 * delta);
+                this.submarine.setCubePositionY();
                 // move camera
                 this.camera.position.y -= 10 * delta;
             }
             else {
                 this.submarine.setPositionY(this.submarine.getPosition().y -= 10 * delta);
+                this.submarine.setCubePositionY();
                 // move camera
                 this.camera.position.y -= 10 * delta;
             }
@@ -80,14 +83,17 @@ export default class SubmarineControls {
         if (keysPressed[V]) {
             if (this.submarine.getPosition().y >= 0) {
                 this.submarine.setPositionY(this.submarine.getPosition().y = 0);
+                this.submarine.setCubePositionY();
             }
             else if (this.submarine.getPosition().y > -30) {
                 this.submarine.setPositionY(this.submarine.getPosition().y += 10 * delta);
+                this.submarine.setCubePositionY();
                 // move camera
                 this.camera.position.y += 10 * delta;
             }
             else {
                 this.submarine.setPositionY(this.submarine.getPosition().y += 10 * delta);
+                this.submarine.setCubePositionY();
                 // move camera
                 this.camera.position.y += 10 * delta;
             }
@@ -110,6 +116,7 @@ export default class SubmarineControls {
             // rotate model
             this.rotateQuarternion.setFromAxisAngle(this.rotateAngle, angleYCameraDirection + directionOffset)
             this.submarine.model.quaternion.rotateTowards(this.rotateQuarternion, 0.2)
+            this.submarine.cube.quaternion.rotateTowards(this.rotateQuarternion, 0.2)
 
             // calculate direction
             this.camera.getWorldDirection(this.walkDirection)
@@ -123,9 +130,15 @@ export default class SubmarineControls {
             // move model & camera
             const moveX = this.walkDirection.x * 100 * delta
             const moveZ = this.walkDirection.z * 100 * delta
-            this.submarine.setPositionX(this.submarine.getPosition().x += moveX)
-            this.submarine.setPositionZ(this.submarine.getPosition().z += moveZ)
-            this.updateCameraTarget(moveX, moveZ)
+            if (!cubeCollision && !sphereCollision) {
+                this.submarine.setPositionX(this.submarine.getPosition().x += moveX)
+                this.submarine.setCubePositionX();
+
+                this.submarine.setPositionZ(this.submarine.getPosition().z += moveZ)
+                this.submarine.setCubePositionZ();
+
+                this.updateCameraTarget(moveX, moveZ)
+            }
         }
     }
 
@@ -136,9 +149,9 @@ export default class SubmarineControls {
 
         // update camera target
         this.orbitControl.target.set(
-            this.submarine.getPosition().x,
-            this.submarine.getPosition().y,
-            this.submarine.getPosition().z
+            this.submarine.cube.position.x,
+            this.submarine.cube.position.y,
+            this.submarine.cube.position.z,
         );
     }
 

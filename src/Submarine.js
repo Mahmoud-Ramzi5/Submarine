@@ -12,6 +12,17 @@ export default class Submarine {
 
         this.position = new THREE.Vector3(0, 0, 0);
         this.model = null;
+        this.cube = new THREE.Mesh(
+            new THREE.BoxGeometry(5, 5, 50),
+            new THREE.MeshBasicMaterial({ color: 0xff0000 })
+        );
+        this.cube.material.opacity = 0;
+        this.cube.material.transparent = true;
+        this.cube.position.x = this.position.x;
+        this.cube.position.z = this.position.z;
+        this.cubebb = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+        this.cubebb.setFromObject(this.cube);
+
         this.steer_angle_X_Z = 0;
         this.steer_angle_XZ_Y = 0;
     }
@@ -84,14 +95,17 @@ export default class Submarine {
 
     rotateX(angle) {
         this.model.rotateX(angle);
+        this.cube.rotateX(angle);
     };
 
     rotateY(angle) {
         this.model.rotateY(angle);
+        this.cube.rotateY(angle);
     };
 
     rotateZ(angle) {
         this.model.rotateZ(angle);
+        this.cube.rotateZ(angle);
     };
 
 
@@ -127,5 +141,21 @@ export default class Submarine {
 
     calcVolume() {
         return (Math.PI * (this.radius ** 2) * this.length);
+    }
+
+    rebindCubebb() {
+        this.cubebb.copy(this.cube.geometry.boundingBox).applyMatrix4(this.cube.matrixWorld);
+    }
+
+    setCubePositionX() {
+        this.cube.position.x = this.position.x;
+    }
+
+    setCubePositionY() {
+        this.cube.position.y = this.position.y;
+    }
+
+    setCubePositionZ() {
+        this.cube.position.z = this.position.z;
     }
 }
