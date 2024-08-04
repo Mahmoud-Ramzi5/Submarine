@@ -79,16 +79,19 @@ export default class Submarine {
 
     setPositionX(x) {
         this.model.position.x = x;
+        this.cube.position.x = x;
         this.position.x = x;
     }
 
     setPositionY(y) {
         this.model.position.y = y;
+        this.cube.position.y = y;
         this.position.y = y;
     }
 
     setPositionZ(z) {
         this.model.position.z = z;
+        this.cube.position.z = z;
         this.position.z = z;
     }
 
@@ -118,6 +121,20 @@ export default class Submarine {
     }
 
 
+    rebindCubebb() {
+        this.cubebb.copy(this.cube.geometry.boundingBox).applyMatrix4(this.cube.matrixWorld);
+    }
+
+
+    calcArea() {
+        return ((2 * Math.PI * this.radius * this.length) + (2 * Math.PI * (this.radius ** 2)));
+    }
+
+    calcVolume() {
+        return (Math.PI * (this.radius ** 2) * this.length);
+    }
+
+
     getSteerAngleXZ() {
         return this.steer_angle_X_Z;
     }
@@ -132,30 +149,5 @@ export default class Submarine {
 
     setSteerAngleXZY(angle) {
         this.steer_angle_XZ_Y = angle;
-    }
-
-
-    calcArea() {
-        return ((2 * Math.PI * this.radius * this.length) + (2 * Math.PI * (this.radius ** 2)));
-    }
-
-    calcVolume() {
-        return (Math.PI * (this.radius ** 2) * this.length);
-    }
-
-    rebindCubebb() {
-        this.cubebb.copy(this.cube.geometry.boundingBox).applyMatrix4(this.cube.matrixWorld);
-    }
-
-    setCubePositionX() {
-        this.cube.position.x = this.position.x;
-    }
-
-    setCubePositionY() {
-        this.cube.position.y = this.position.y;
-    }
-
-    setCubePositionZ() {
-        this.cube.position.z = this.position.z;
     }
 }

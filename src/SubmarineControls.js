@@ -58,17 +58,14 @@ export default class SubmarineControls {
         if (keysPressed[C]) {
             if (this.submarine.getPosition().y <= -500) {
                 this.submarine.setPositionY(this.submarine.getPosition().y = -500);
-                this.submarine.setCubePositionY();
             }
             else if (this.submarine.getPosition().y > -30) {
                 this.submarine.setPositionY(this.submarine.getPosition().y -= 10 * delta);
-                this.submarine.setCubePositionY();
                 // move camera
                 this.camera.position.y -= 10 * delta;
             }
             else {
                 this.submarine.setPositionY(this.submarine.getPosition().y -= 10 * delta);
-                this.submarine.setCubePositionY();
                 // move camera
                 this.camera.position.y -= 10 * delta;
             }
@@ -83,17 +80,14 @@ export default class SubmarineControls {
         if (keysPressed[V]) {
             if (this.submarine.getPosition().y >= 0) {
                 this.submarine.setPositionY(this.submarine.getPosition().y = 0);
-                this.submarine.setCubePositionY();
             }
             else if (this.submarine.getPosition().y > -30) {
                 this.submarine.setPositionY(this.submarine.getPosition().y += 10 * delta);
-                this.submarine.setCubePositionY();
                 // move camera
                 this.camera.position.y += 10 * delta;
             }
             else {
                 this.submarine.setPositionY(this.submarine.getPosition().y += 10 * delta);
-                this.submarine.setCubePositionY();
                 // move camera
                 this.camera.position.y += 10 * delta;
             }
@@ -132,10 +126,7 @@ export default class SubmarineControls {
             const moveZ = this.walkDirection.z * 100 * delta
             if (!cubeCollision && !sphereCollision) {
                 this.submarine.setPositionX(this.submarine.getPosition().x += moveX)
-                this.submarine.setCubePositionX();
-
                 this.submarine.setPositionZ(this.submarine.getPosition().z += moveZ)
-                this.submarine.setCubePositionZ();
 
                 this.updateCameraTarget(moveX, moveZ)
             }
