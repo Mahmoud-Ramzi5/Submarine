@@ -65,6 +65,8 @@ orbitControls.update();
 const SpeedVec = new THREE.Vector3(0, 0, 0);
 const submarine = new Submarine(2500000, 2800000, 73, 13, 5, 10.27, 0.04);
 
+var listOfBoxes = [];
+var listOfSpheres = [];
 var submarineControls;
 // Load submarine model
 async function loadSubmarineModel() {
@@ -108,64 +110,258 @@ async function loadSubmarineModel() {
 }
 loadSubmarineModel();
 
-//Load the iceberg
+//Load the icebergs
 async function loadIcebergModel() {
     // Load a glTF resource
-    const iceberg_model = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
-    if (iceberg_model) {
-        iceberg_model.scale.set(200, 200, 200);
-        iceberg_model.position.set(0, -100, -300);
-        iceberg_model.traverse((child) => {
+    const iceberg_model1 = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
+    if (iceberg_model1) {
+        iceberg_model1.scale.set(200, 200, 200);
+        iceberg_model1.position.set(0, -100, -300);
+        iceberg_model1.traverse((child) => {
             if (child.isMesh) {
                 child.castShadow = true;
             }
         });
-        sceneManager.scene.add(iceberg_model);
+        sceneManager.scene.add(iceberg_model1);
+    }
+    const iceberg_model2 = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
+    if (iceberg_model2) {
+        iceberg_model2.scale.set(200, 200, 200);
+        iceberg_model2.position.set(700, -100, -100);
+        iceberg_model2.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true;
+            }
+        });
+        sceneManager.scene.add(iceberg_model2);
+    }
+    const iceberg_model3 = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
+    if (iceberg_model3) {
+        iceberg_model3.scale.set(200, 200, 200);
+        iceberg_model3.position.set(-700, -100, 0);
+        iceberg_model3.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true;
+            }
+        });
+        sceneManager.scene.add(iceberg_model3);
+    }
+    const iceberg_model4 = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
+    if (iceberg_model4) {
+        iceberg_model4.scale.set(200, 200, 200);
+        iceberg_model4.position.set(0, -100, 500);
+        iceberg_model4.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true;
+            }
+        });
+        sceneManager.scene.add(iceberg_model4);
+    }
+    const iceberg_model5 = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
+    if (iceberg_model5) {
+        iceberg_model5.scale.set(200, 200, 200);
+        iceberg_model5.position.set(600, -100, -1000);
+        iceberg_model5.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true;
+            }
+        });
+        sceneManager.scene.add(iceberg_model5);
+    }
+    const iceberg_model6 = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
+    if (iceberg_model6) {
+        iceberg_model6.scale.set(200, 200, 200);
+        iceberg_model6.position.set(-1000, -100, 500);
+        iceberg_model6.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true;
+            }
+        });
+        sceneManager.scene.add(iceberg_model6);
     }
 }
 loadIcebergModel();
 
+
+// Make the boxes and spheres for collisions
+// 1
 const sphere1 = new THREE.Mesh(
     new THREE.SphereGeometry(100),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }
     )
 );
+sphere1.material.color.setHex(0xff0000);
+sphere1.material.transparent = true;
+sphere1.material.opacity = 0;
 sphere1.position.set(0, -30, -300)
-let spherebb = new THREE.Sphere(sphere1.position, 100);
-console.log(spherebb);
+let sphere1bb = new THREE.Sphere(sphere1.position, 100);
 sceneManager.scene.add(sphere1);
+listOfSpheres.push(sphere1bb)
 
 const cube1 = new THREE.Mesh(
     new THREE.BoxGeometry(150, 175, 150),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }
     )
 );
+cube1.material.transparent = true;
+cube1.material.opacity = 0;
 cube1.position.set(0, -175, -300)
 let cube1bb = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 cube1bb.setFromObject(cube1);
-console.log(cube1bb);
 sceneManager.scene.add(cube1);
+listOfBoxes.push(cube1bb);
+// 2
+const sphere2 = new THREE.Mesh(
+    new THREE.SphereGeometry(100),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 }
+    )
+);
+sphere2.material.color.setHex(0xff0000);
+sphere2.material.transparent = true;
+sphere2.material.opacity = 0;
+sphere2.position.set(700, -30, -100)
+let sphere2bb = new THREE.Sphere(sphere2.position, 100);
+sceneManager.scene.add(sphere2);
+listOfSpheres.push(sphere2bb)
+
+const cube2 = new THREE.Mesh(
+    new THREE.BoxGeometry(150, 175, 150),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 }
+    )
+);
+cube2.material.transparent = true;
+cube2.material.opacity = 0;
+cube2.position.set(700, -175, -100)
+let cube2bb = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+cube2bb.setFromObject(cube2);
+sceneManager.scene.add(cube2);
+listOfBoxes.push(cube2bb);
+// 3
+const sphere3 = new THREE.Mesh(
+    new THREE.SphereGeometry(100),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 }
+    )
+);
+sphere3.material.color.setHex(0xff0000);
+sphere3.material.transparent = true;
+sphere3.material.opacity = 0;
+sphere3.position.set(-700, -30, 0)
+let sphere3bb = new THREE.Sphere(sphere3.position, 100);
+sceneManager.scene.add(sphere3);
+listOfSpheres.push(sphere3bb)
+
+const cube3 = new THREE.Mesh(
+    new THREE.BoxGeometry(150, 175, 150),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 }
+    )
+);
+cube3.material.transparent = true;
+cube3.material.opacity = 0;
+cube3.position.set(-700, -175, 0)
+let cube3bb = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+cube3bb.setFromObject(cube3);
+sceneManager.scene.add(cube3);
+listOfBoxes.push(cube3bb);
+// 4
+const sphere4 = new THREE.Mesh(
+    new THREE.SphereGeometry(100),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 }
+    )
+);
+sphere4.material.color.setHex(0xff0000);
+sphere4.material.transparent = true;
+sphere4.material.opacity = 0;
+sphere4.position.set(0, -30, 500)
+let sphere4bb = new THREE.Sphere(sphere4.position, 100);
+sceneManager.scene.add(sphere4);
+listOfSpheres.push(sphere4bb)
+
+const cube4 = new THREE.Mesh(
+    new THREE.BoxGeometry(150, 175, 150),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 }
+    )
+);
+cube4.material.transparent = true;
+cube4.material.opacity = 0;
+cube4.position.set(0, -175, 500)
+let cube4bb = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+cube4bb.setFromObject(cube4);
+sceneManager.scene.add(cube4);
+listOfBoxes.push(cube4bb);
+// 5
+const sphere5 = new THREE.Mesh(
+    new THREE.SphereGeometry(100),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 }
+    )
+);
+sphere5.material.color.setHex(0xff0000);
+sphere5.material.transparent = true;
+sphere5.material.opacity = 0;
+sphere5.position.set(600, -30, -1000)
+let sphere5bb = new THREE.Sphere(sphere5.position, 100);
+sceneManager.scene.add(sphere5);
+listOfSpheres.push(sphere5bb)
+
+const cube5 = new THREE.Mesh(
+    new THREE.BoxGeometry(150, 175, 150),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 }
+    )
+);
+cube5.material.transparent = true;
+cube5.material.opacity = 0;
+cube5.position.set(600, -175, -1000)
+let cube5bb = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+cube5bb.setFromObject(cube5);
+sceneManager.scene.add(cube5);
+listOfBoxes.push(cube5bb);
+// 6
+const sphere6 = new THREE.Mesh(
+    new THREE.SphereGeometry(100),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 }
+    )
+);
+sphere6.material.color.setHex(0xff0000);
+sphere6.material.transparent = true;
+sphere6.material.opacity = 0;
+sphere6.position.set(-1000, -30, 500)
+let sphere6bb = new THREE.Sphere(sphere6.position, 100);
+sceneManager.scene.add(sphere6);
+listOfSpheres.push(sphere6bb)
+
+const cube6 = new THREE.Mesh(
+    new THREE.BoxGeometry(150, 175, 150),
+    new THREE.MeshPhongMaterial({ color: 0xff0000 }
+    )
+);
+cube6.material.transparent = true;
+cube6.material.opacity = 0;
+cube6.position.set(-1000, -175, 500)
+let cube6bb = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
+cube6bb.setFromObject(cube6);
+sceneManager.scene.add(cube6);
+listOfBoxes.push(cube6bb);
+console.log(listOfBoxes);
 
 /* Collision */
 var cubeCollision = false;
 var sphereCollision = false;
 function checkCollision() {
-    if (submarine.cubebb.intersectsBox(cube1bb)) {
+    if (submarine.cubebb.intersectsBox(cube1bb) || submarine.cubebb.intersectsBox(cube2bb)
+        || submarine.cubebb.intersectsBox(cube3bb) || submarine.cubebb.intersectsBox(cube4bb)
+        || submarine.cubebb.intersectsBox(cube5bb) || submarine.cubebb.intersectsBox(cube6bb)) {
         cubeCollision = true
     } else {
-        cube1.material.transparent = true;
-        cube1.material.opacity = 0;
         cubeCollision = false;
-    }
-    if (submarine.cubebb.intersectsSphere(spherebb)) {
+    };
+
+    if (submarine.cubebb.intersectsSphere(sphere1bb) || submarine.cubebb.intersectsSphere(sphere2bb)
+        || submarine.cubebb.intersectsSphere(sphere3bb) || submarine.cubebb.intersectsSphere(sphere4bb)
+        || submarine.cubebb.intersectsSphere(sphere5bb) || submarine.cubebb.intersectsSphere(sphere6bb)) {
         sphereCollision = true;
     } else {
-        sphere1.material.color.setHex(0xff0000);
-        sphere1.material.transparent = true;
-        sphere1.material.opacity = 0;
         sphereCollision = false;
     }
-}
+};
 
 // actions for submarine movement
 const actions = {
