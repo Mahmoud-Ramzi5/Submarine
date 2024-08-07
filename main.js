@@ -110,7 +110,7 @@ loadSubmarineModel();
 //Load the icebergs
 async function loadIcebergModel() {
     // Load a glTF resource
-    const iceberg_model1 = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
+    const iceberg_model1 = await modelLoaders.load_GLTF_Model('/resources/models/iceberg/scene.gltf');
     if (iceberg_model1) {
         iceberg_model1.scale.set(200, 200, 200);
         iceberg_model1.position.set(0, -100, -300);
@@ -121,7 +121,7 @@ async function loadIcebergModel() {
         });
         sceneManager.scene.add(iceberg_model1);
     }
-    const iceberg_model2 = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
+    const iceberg_model2 = await modelLoaders.load_GLTF_Model('/resources/models/iceberg/scene.gltf');
     if (iceberg_model2) {
         iceberg_model2.scale.set(200, 200, 200);
         iceberg_model2.position.set(700, -100, -100);
@@ -132,7 +132,7 @@ async function loadIcebergModel() {
         });
         sceneManager.scene.add(iceberg_model2);
     }
-    const iceberg_model3 = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
+    const iceberg_model3 = await modelLoaders.load_GLTF_Model('/resources/models/iceberg/scene.gltf');
     if (iceberg_model3) {
         iceberg_model3.scale.set(200, 200, 200);
         iceberg_model3.position.set(-700, -100, 0);
@@ -143,7 +143,7 @@ async function loadIcebergModel() {
         });
         sceneManager.scene.add(iceberg_model3);
     }
-    const iceberg_model4 = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
+    const iceberg_model4 = await modelLoaders.load_GLTF_Model('/resources/models/iceberg/scene.gltf');
     if (iceberg_model4) {
         iceberg_model4.scale.set(200, 200, 200);
         iceberg_model4.position.set(0, -100, 500);
@@ -154,7 +154,7 @@ async function loadIcebergModel() {
         });
         sceneManager.scene.add(iceberg_model4);
     }
-    const iceberg_model5 = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
+    const iceberg_model5 = await modelLoaders.load_GLTF_Model('/resources/models/iceberg/scene.gltf');
     if (iceberg_model5) {
         iceberg_model5.scale.set(200, 200, 200);
         iceberg_model5.position.set(600, -100, -1000);
@@ -165,7 +165,7 @@ async function loadIcebergModel() {
         });
         sceneManager.scene.add(iceberg_model5);
     }
-    const iceberg_model6 = await modelLoaders.load_GLTF_Model('/resources/models/iceber01/scene.gltf');
+    const iceberg_model6 = await modelLoaders.load_GLTF_Model('/resources/models/iceberg/scene.gltf');
     if (iceberg_model6) {
         iceberg_model6.scale.set(200, 200, 200);
         iceberg_model6.position.set(-1000, -100, 500);
