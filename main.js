@@ -71,7 +71,7 @@ var submarineControls;
 // Load submarine model
 async function loadSubmarineModel() {
     // Load a glTF resource
-    const submarine_model = await modelLoaders.load_GLTF_Model('/resources/models/edited.glb');
+    const submarine_model = await modelLoaders.load_GLTF_Model('/resources/models/Submarine.glb');
     if (submarine_model) {
         submarine_model.scale.set(10, 10, 10);
         submarine_model.traverse((child) => {
@@ -103,9 +103,6 @@ async function loadSubmarineModel() {
         // );
 
         submarineControls = new SubmarineControls(submarine, 'mixer', 'animationsMap', orbitControls, sceneManager.camera, 'Idle')
-
-        //calcPhysics();
-
     }
 }
 loadSubmarineModel();
@@ -187,8 +184,7 @@ loadIcebergModel();
 // 1
 const sphere1 = new THREE.Mesh(
     new THREE.SphereGeometry(100),
-    new THREE.MeshPhongMaterial({ color: 0xff0000 }
-    )
+    new THREE.MeshPhongMaterial({ color: 0xff0000 })
 );
 sphere1.material.color.setHex(0xff0000);
 sphere1.material.transparent = true;
@@ -200,8 +196,7 @@ listOfSpheres.push(sphere1bb)
 
 const cube1 = new THREE.Mesh(
     new THREE.BoxGeometry(150, 175, 150),
-    new THREE.MeshPhongMaterial({ color: 0xff0000 }
-    )
+    new THREE.MeshPhongMaterial({ color: 0xff0000 })
 );
 cube1.material.transparent = true;
 cube1.material.opacity = 0;
@@ -342,6 +337,7 @@ sceneManager.scene.add(cube6);
 listOfBoxes.push(cube6bb);
 console.log(listOfBoxes);
 
+
 /* Collision */
 var cubeCollision = false;
 var sphereCollision = false;
@@ -363,7 +359,7 @@ function checkCollision() {
     }
 };
 
-// actions for submarine movement
+// Actions for submarine movement
 const actions = {
     dive: false,
     float: false,
@@ -390,7 +386,6 @@ function calcPhysics() {
     // const submarine_thrust = physics.Thrust(4*Math.PI, 
     //     new THREE.Vector3(0, 0, 1).normalize().multiplyScalar(submarine.max_speed), 
     //     new THREE.Vector3(0, 0, 1).normalize().multiplyScalar(submarine.max_speed+20));
-
 
     // const acceleration = physics.NewtonSecondLaw(
     //     submarine.mass,
@@ -476,15 +471,18 @@ function calcPhysics() {
 
     const velocity = physics.getAccerlationVelocity(startVelocity, acceleration);
     const positionCoordinates = physics.getPosition(startPosition, velocity);
+
+    // Check Coordinates
     if (positionCoordinates.y > 0) {
-        console.log('submarine cant fly');
+        console.log('Submarine can not fly');
         positionCoordinates.y = 0;
     } else if (positionCoordinates.y < -1000) {
-        console.log('cant go deeper');
+        console.log('Submarine can not go deeper');
         positionCoordinates.y = -1000;
     } else { }
 
     console.log(acceleration);
+    console.log(velocity);
     console.log(positionCoordinates);
     console.log(sceneManager.camera.position);
 
@@ -500,6 +498,7 @@ function calcPhysics() {
 //     // use t here, optionally clamp and/or add conditions
 //     requestAnimationFrame(loop);    // provides current high-res time as argument
 // }
+
 function moveSubmarine(sPos, sV, a, v, x) {
     const MinY = -1000;
     const MaxY = 0;
@@ -530,6 +529,7 @@ function moveSubmarine(sPos, sV, a, v, x) {
     } else {
         angleRad = angleRadXZ / 1000;
     }
+
     var angleRadYZ = Math.atan(x.y / x.z);
     var angleRad2 = angleRadYZ / 2000;
 
@@ -585,7 +585,6 @@ function moveSubmarine(sPos, sV, a, v, x) {
             j = 11;
         }
     }
-
     rotate();
 
     function move() {
@@ -598,40 +597,33 @@ function moveSubmarine(sPos, sV, a, v, x) {
                 if (sPos.x > x.x) {
                     if (submarine.getPosition().x > x.x) {
                         submarine.setPositionX(submarine.getPosition().x += stepx);
-                        submarine.setCubePositionX();
                     }
                 } else if (sPos.x < x.x) {
                     if (submarine.getPosition().x < x.x) {
                         submarine.setPositionX(submarine.getPosition().x += stepx);
-                        submarine.setCubePositionX();
                     }
                 } else { }
 
                 if (sPos.z > x.z) {
                     if (submarine.getPosition().z > x.z) {
                         submarine.setPositionZ(submarine.getPosition().z += stepz);
-                        submarine.setCubePositionZ();
                     }
                 } else if (sPos.z < x.z) {
                     if (submarine.getPosition().z < x.z) {
                         submarine.setPositionZ(submarine.getPosition().z += stepz);
-                        submarine.setCubePositionZ();
                     }
                 } else { }
 
                 if (submarine.getPosition().y > MaxY) {
                     submarine.setPositionY(MaxY);
-                    submarine.setCubePositionY();
                 }
                 else if (submarine.getPosition().y < MinY) {
                     submarine.setPositionY(MinY);
-                    submarine.setCubePositionY();
                 }
                 else {
                     if (sPos.y > x.y) {
                         if (submarine.getPosition().y > x.y) {
                             submarine.setPositionY(submarine.getPosition().y += stepy);
-                            submarine.setCubePositionY();
                             if (i > physics.getTime() * 0.2 && i < physics.getTime() * 0.6) {
                                 submarine.rotateX(angleRad2);
                                 submarine.rotateX(angleRad2);
@@ -641,12 +633,10 @@ function moveSubmarine(sPos, sV, a, v, x) {
                             }
                         } else {
                             submarine.setPositionY(submarine.getPosition().y -= stepy);
-                            submarine.setCubePositionY();
                         }
                     } else if (sPos.y < x.y) {
                         if (submarine.getPosition().y < x.y) {
                             submarine.setPositionY(submarine.getPosition().y += stepy);
-                            submarine.setCubePositionY();
                             if (i > 0 && i < physics.getTime() * 0.4) {
                                 submarine.rotateX(angleRad2);
                                 submarine.rotateX(angleRad2);
@@ -755,7 +745,6 @@ MovementFolder.add(physics, 'Time', 0, 86400, 1)
 MovementFolder.add(submarine.getPosition(), 'x')
     .name('Submarine start X coords').onChange((value) => {
         submarine.setPositionX(value);
-        submarine.setCubePositionX();
         orbitControls.target.set(
             submarine.getPosition().x,
             submarine.getPosition().y,
@@ -771,7 +760,6 @@ MovementFolder.add(submarine.getPosition(), 'x')
 MovementFolder.add(submarine.getPosition(), 'y', -1000, 0)
     .name('Submarine start Y coords').onChange((value) => {
         submarine.setPositionY(value);
-        submarine.setCubePositionY();
         orbitControls.target.set(
             submarine.getPosition().x,
             submarine.getPosition().y,
@@ -787,7 +775,6 @@ MovementFolder.add(submarine.getPosition(), 'y', -1000, 0)
 MovementFolder.add(submarine.getPosition(), 'z')
     .name('Submarine start Z coords').onChange((value) => {
         submarine.setPositionZ(value);
-        submarine.setCubePositionZ();
         orbitControls.target.set(
             submarine.getPosition().x,
             submarine.getPosition().y,
@@ -822,8 +809,6 @@ function setChecked(prop) {
     actions[prop] = true;
 }
 
-
-
 // var GG = new function () {
 //     this.steer_angle = submarine.getSteerAngleXZ();
 // }
@@ -843,9 +828,7 @@ MovementFolder.add(obj, 'calcPhysics').name('Start Movement');
 /* Text */
 const textDiv = document.getElementById('text');
 
-
 const clock = new THREE.Clock();
-
 
 /* Render */
 function render() {
@@ -861,9 +844,10 @@ function render() {
         submarineControls.update(mixerUpdateDelta, keysPressed, cubeCollision, sphereCollision);
     }
     orbitControls.update();
-    //moveCube();
+
     submarine.rebindCubebb();
     checkCollision();
+
     //water.material.uniforms['time'].value += 0.01;
     textDiv.innerHTML = `X = ${submarine.position.x.toFixed(3)}, 
 Y = ${submarine.position.y.toFixed(3)}, Z = ${submarine.position.z.toFixed(3)}`

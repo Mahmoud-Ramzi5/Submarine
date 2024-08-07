@@ -19,7 +19,7 @@ export default class SceneManager {
     this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(this.renderer.domElement);
-    
+
     // Clock, Stats, Controls
     this.clock = new THREE.Clock();
     this.stats = Stats();
