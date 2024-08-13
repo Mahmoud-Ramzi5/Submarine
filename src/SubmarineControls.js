@@ -6,8 +6,9 @@ const S = 's'
 const D = 'd'
 const C = 'c'
 const V = 'v'
+const R = 'r'
 
-const DIRECTIONS = [W, A, S, D, C, V]
+const DIRECTIONS = [W, A, S, D, C, V, R]
 
 export default class SubmarineControls {
     // Temporary Data
@@ -55,6 +56,22 @@ export default class SubmarineControls {
         // this.mixer.update(delta)
 
         // if (this.currentAction == 'Run' || this.currentAction == 'Walk') {
+        if (keysPressed[R]) {
+            this.submarine.setPositionX(0);
+            this.submarine.setPositionY(0);
+            this.submarine.setPositionZ(0.85);
+
+            this.orbitControl.target.set(
+                this.submarine.getPosition().x,
+                this.submarine.getPosition().y,
+                this.submarine.getPosition().z
+            );
+            this.camera.position.set(
+                this.submarine.getPosition().x,
+                this.submarine.getPosition().y + 25,
+                this.submarine.getPosition().z + 100
+            );
+        }
         if (keysPressed[C]) {
             if (this.submarine.getPosition().y <= -500) {
                 this.submarine.setPositionY(this.submarine.getPosition().y = -500);
@@ -108,10 +125,11 @@ export default class SubmarineControls {
             var directionOffset = this.directionOffset(keysPressed)
 
             // rotate model
-            this.rotateQuarternion.setFromAxisAngle(this.rotateAngle, angleYCameraDirection + directionOffset)
-            this.submarine.model.quaternion.rotateTowards(this.rotateQuarternion, 0.2)
-            this.submarine.cube.quaternion.rotateTowards(this.rotateQuarternion, 0.2)
-
+            if (directionOffset !== Math.PI) {
+                this.rotateQuarternion.setFromAxisAngle(this.rotateAngle, angleYCameraDirection + directionOffset)
+                this.submarine.model.quaternion.rotateTowards(this.rotateQuarternion, 0.2)
+                this.submarine.cube.quaternion.rotateTowards(this.rotateQuarternion, 0.2)
+            } else { }
             // calculate direction
             this.camera.getWorldDirection(this.walkDirection)
             this.walkDirection.y = 0
@@ -157,18 +175,17 @@ export default class SubmarineControls {
             }
         } else if (keysPressed[S]) {
             if (keysPressed[A]) {
-                directionOffset = Math.PI / 4 + Math.PI / 2 // s+a
+                directionOffset = Math.PI // s+a
             } else if (keysPressed[D]) {
-                directionOffset = -Math.PI / 4 - Math.PI / 2 // s+d
+                directionOffset = Math.PI // s+d
             } else {
                 directionOffset = Math.PI // s
             }
         } else if (keysPressed[A]) {
-            directionOffset = Math.PI / 2 // a
+            directionOffset = Math.PI / 2 // aw
         } else if (keysPressed[D]) {
             directionOffset = - Math.PI / 2 // d
         }
-
         return directionOffset
     }
 }

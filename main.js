@@ -52,7 +52,7 @@ const orbitControls = new OrbitControls(sceneManager.camera, sceneManager.getRen
 orbitControls.enableDamping = true;
 // orbitControls.minDistance = 5;
 // orbitControls.maxDistance = 15;
-orbitControls.enablePan = true;
+orbitControls.enablePan = false;
 orbitControls.enableZoom = false;
 // orbitControls.maxPolarAngle = (Math.PI / 2) - 0.05;
 orbitControls.update();
@@ -63,6 +63,7 @@ orbitControls.update();
 
 /* Submarine */
 const SpeedVec = new THREE.Vector3(0, 0, 0);
+const startVelocity = new THREE.Vector3(0, 0, -1);
 const submarine = new Submarine(2500000, 2800000, 73, 13, 5, 10.27, 0.04);
 
 var listOfBoxes = [];
@@ -92,7 +93,7 @@ async function loadSubmarineModel() {
             submarine.getPosition().z
         );
         sceneManager.camera.position.set(
-            submarine.getPosition().x - 10,
+            submarine.getPosition().x,
             submarine.getPosition().y + 25,
             submarine.getPosition().z + 100
         );
@@ -183,19 +184,19 @@ loadIcebergModel();
 // Make the boxes and spheres for collisions
 // 1
 const sphere1 = new THREE.Mesh(
-    new THREE.SphereGeometry(100),
+    new THREE.SphereGeometry(90),
     new THREE.MeshPhongMaterial({ color: 0xff0000 })
 );
 sphere1.material.color.setHex(0xff0000);
 sphere1.material.transparent = true;
 sphere1.material.opacity = 0;
 sphere1.position.set(0, -30, -300)
-let sphere1bb = new THREE.Sphere(sphere1.position, 100);
+let sphere1bb = new THREE.Sphere(sphere1.position, 90);
 sceneManager.scene.add(sphere1);
 listOfSpheres.push(sphere1bb)
 
 const cube1 = new THREE.Mesh(
-    new THREE.BoxGeometry(150, 175, 150),
+    new THREE.BoxGeometry(125, 175, 125),
     new THREE.MeshPhongMaterial({ color: 0xff0000 })
 );
 cube1.material.transparent = true;
@@ -207,7 +208,7 @@ sceneManager.scene.add(cube1);
 listOfBoxes.push(cube1bb);
 // 2
 const sphere2 = new THREE.Mesh(
-    new THREE.SphereGeometry(100),
+    new THREE.SphereGeometry(90),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }
     )
 );
@@ -215,12 +216,12 @@ sphere2.material.color.setHex(0xff0000);
 sphere2.material.transparent = true;
 sphere2.material.opacity = 0;
 sphere2.position.set(700, -30, -100)
-let sphere2bb = new THREE.Sphere(sphere2.position, 100);
+let sphere2bb = new THREE.Sphere(sphere2.position, 90);
 sceneManager.scene.add(sphere2);
 listOfSpheres.push(sphere2bb)
 
 const cube2 = new THREE.Mesh(
-    new THREE.BoxGeometry(150, 175, 150),
+    new THREE.BoxGeometry(125, 175, 125),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }
     )
 );
@@ -233,7 +234,7 @@ sceneManager.scene.add(cube2);
 listOfBoxes.push(cube2bb);
 // 3
 const sphere3 = new THREE.Mesh(
-    new THREE.SphereGeometry(100),
+    new THREE.SphereGeometry(90),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }
     )
 );
@@ -241,12 +242,12 @@ sphere3.material.color.setHex(0xff0000);
 sphere3.material.transparent = true;
 sphere3.material.opacity = 0;
 sphere3.position.set(-700, -30, 0)
-let sphere3bb = new THREE.Sphere(sphere3.position, 100);
+let sphere3bb = new THREE.Sphere(sphere3.position, 90);
 sceneManager.scene.add(sphere3);
 listOfSpheres.push(sphere3bb)
 
 const cube3 = new THREE.Mesh(
-    new THREE.BoxGeometry(150, 175, 150),
+    new THREE.BoxGeometry(125, 175, 125),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }
     )
 );
@@ -259,7 +260,7 @@ sceneManager.scene.add(cube3);
 listOfBoxes.push(cube3bb);
 // 4
 const sphere4 = new THREE.Mesh(
-    new THREE.SphereGeometry(100),
+    new THREE.SphereGeometry(90),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }
     )
 );
@@ -267,12 +268,12 @@ sphere4.material.color.setHex(0xff0000);
 sphere4.material.transparent = true;
 sphere4.material.opacity = 0;
 sphere4.position.set(0, -30, 500)
-let sphere4bb = new THREE.Sphere(sphere4.position, 100);
+let sphere4bb = new THREE.Sphere(sphere4.position, 90);
 sceneManager.scene.add(sphere4);
 listOfSpheres.push(sphere4bb)
 
 const cube4 = new THREE.Mesh(
-    new THREE.BoxGeometry(150, 175, 150),
+    new THREE.BoxGeometry(125, 175, 125),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }
     )
 );
@@ -285,7 +286,7 @@ sceneManager.scene.add(cube4);
 listOfBoxes.push(cube4bb);
 // 5
 const sphere5 = new THREE.Mesh(
-    new THREE.SphereGeometry(100),
+    new THREE.SphereGeometry(90),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }
     )
 );
@@ -293,12 +294,12 @@ sphere5.material.color.setHex(0xff0000);
 sphere5.material.transparent = true;
 sphere5.material.opacity = 0;
 sphere5.position.set(600, -30, -1000)
-let sphere5bb = new THREE.Sphere(sphere5.position, 100);
+let sphere5bb = new THREE.Sphere(sphere5.position, 90);
 sceneManager.scene.add(sphere5);
 listOfSpheres.push(sphere5bb)
 
 const cube5 = new THREE.Mesh(
-    new THREE.BoxGeometry(150, 175, 150),
+    new THREE.BoxGeometry(125, 175, 125),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }
     )
 );
@@ -311,7 +312,7 @@ sceneManager.scene.add(cube5);
 listOfBoxes.push(cube5bb);
 // 6
 const sphere6 = new THREE.Mesh(
-    new THREE.SphereGeometry(100),
+    new THREE.SphereGeometry(90),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }
     )
 );
@@ -319,12 +320,12 @@ sphere6.material.color.setHex(0xff0000);
 sphere6.material.transparent = true;
 sphere6.material.opacity = 0;
 sphere6.position.set(-1000, -30, 500)
-let sphere6bb = new THREE.Sphere(sphere6.position, 100);
+let sphere6bb = new THREE.Sphere(sphere6.position, 90);
 sceneManager.scene.add(sphere6);
 listOfSpheres.push(sphere6bb)
 
 const cube6 = new THREE.Mesh(
-    new THREE.BoxGeometry(150, 175, 150),
+    new THREE.BoxGeometry(125, 175, 125),
     new THREE.MeshPhongMaterial({ color: 0xff0000 }
     )
 );
@@ -403,7 +404,6 @@ function calcPhysics() {
     // );
 
     const startPosition = new THREE.Vector3(0, 0, 0);
-    const startVelocity = new THREE.Vector3(0, 0, -1);
     startPosition.set(submarine.getPosition().x, submarine.getPosition().y, submarine.getPosition().z);
 
     var acceleration;
@@ -520,6 +520,8 @@ function moveSubmarine(sPos, sV, a, v, x) {
     var angleRad, angleRadXZ = startRadXZ1 - startRadXZ0;
     if (angleRadXZ > 3.14) {
         angleRadXZ = Math.atan(x.x / x.z) - Math.PI;
+    } else if (angleRadXZ < -3.14 && sV.x <= 0 && sV.z <= 0) {
+        angleRadXZ = Math.atan(x.x / x.z);
     } else if (angleRadXZ < -3.14) {
         angleRadXZ = Math.atan(x.x / x.z) + Math.PI;
     } else { }
@@ -540,13 +542,19 @@ function moveSubmarine(sPos, sV, a, v, x) {
     let j = 0;
     let i = physics.getTime();
     let k = physics.getTime();
+    let l = 0;
+
 
     function rotate() {
-        requestAnimationFrame(rotate);
+        var RotationAnimation = requestAnimationFrame(rotate);
         if (!cubeCollision && !sphereCollision) {
             if (angleRadXZ < -1.5 || angleRadXZ > 1.5) {
                 if (j < 10) {
                     if (!isNaN(angleRadXZ)) {
+                        if (Math.ceil(startRadXZ0) == Math.ceil(startRadXZ1 + Math.PI)) {
+                            j = 10;
+                            i = 0;
+                        }
                         if (Math.ceil(startRadXZ0) != Math.ceil(startRadXZ1)) {
                             submarine.rotateY(angleRad);
                             j += 0.01;
@@ -565,6 +573,10 @@ function moveSubmarine(sPos, sV, a, v, x) {
             } else {
                 if (j < 10) {
                     if (!isNaN(angleRadXZ)) {
+                        if (Math.ceil(startRadXZ0) == Math.ceil(startRadXZ1 + Math.PI)) {
+                            j = 10;
+                            i = 0;
+                        }
                         if (Math.ceil(startRadXZ0) != Math.ceil(startRadXZ1)) {
                             submarine.rotateY(angleRad);
                             j += 0.01;
@@ -584,6 +596,10 @@ function moveSubmarine(sPos, sV, a, v, x) {
         } else {
             j = 11;
         }
+
+        if (i <= 0) {
+            cancelAnimationFrame(RotationAnimation);
+        }
     }
     rotate();
 
@@ -591,7 +607,8 @@ function moveSubmarine(sPos, sV, a, v, x) {
         if (a.x == 0 && a.y == 0 && a.z == 0) {
             return;
         }
-        requestAnimationFrame(move);
+        var MovingAnimation = requestAnimationFrame(move);
+        gui.updateDisplay();
         if (!cubeCollision && !sphereCollision) {
             if (i < physics.getTime()) {
                 if (sPos.x > x.x) {
@@ -648,6 +665,7 @@ function moveSubmarine(sPos, sV, a, v, x) {
                     } else { }
                 }
                 i += 0.01;
+                l += 0.01;
 
                 orbitControls.target.set(
                     submarine.getPosition().x,
@@ -674,6 +692,11 @@ function moveSubmarine(sPos, sV, a, v, x) {
         } else {
             i = physics.getTime();
             k = physics.getTime();
+        }
+
+        if (l >= physics.getTime()) {
+            cancelAnimationFrame(MovingAnimation);
+            startVelocity.set(SpeedVec.x, SpeedVec.y, SpeedVec.z);
         }
     }
     move();
