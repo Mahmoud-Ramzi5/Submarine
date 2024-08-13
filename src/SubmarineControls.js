@@ -28,6 +28,7 @@ export default class SubmarineControls {
         // });
         this.orbitControl = orbitControl;
         this.camera = camera;
+        this.speed = 10;
         this.updateCameraTarget(0, 0)
     }
 
@@ -140,8 +141,13 @@ export default class SubmarineControls {
             // const velocity = this.currentAction == 'Run' ? this.runVelocity : this.walkVelocity
 
             // move model & camera
-            const moveX = this.walkDirection.x * 100 * delta
-            const moveZ = this.walkDirection.z * 100 * delta
+
+            const moveX = this.walkDirection.x * this.speed * delta
+            const moveZ = this.walkDirection.z * this.speed * delta
+            if (keysPressed[W] && this.speed < 100) {
+                this.speed += 0.1;
+            }
+            console.log(this.speed);
             if (!cubeCollision && !sphereCollision) {
                 this.submarine.setPositionX(this.submarine.getPosition().x += moveX)
                 this.submarine.setPositionZ(this.submarine.getPosition().z += moveZ)
@@ -182,7 +188,7 @@ export default class SubmarineControls {
                 directionOffset = Math.PI // s
             }
         } else if (keysPressed[A]) {
-            directionOffset = Math.PI / 2 // aw
+            directionOffset = Math.PI / 2 // a
         } else if (keysPressed[D]) {
             directionOffset = - Math.PI / 2 // d
         }
