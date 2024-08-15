@@ -715,6 +715,10 @@ document.addEventListener('keydown', (event) => {
 
 document.addEventListener('keyup', (event) => {
     (keysPressed)[event.key.toLowerCase()] = false
+    if(keysPressed['w']) {}
+    else {
+        submarineControls.speed = 20;
+    }
 }, false);
 
 

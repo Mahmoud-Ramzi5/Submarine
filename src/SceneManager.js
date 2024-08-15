@@ -52,7 +52,7 @@ export default class SceneManager {
     this.scene.add(this.directionalLight);
 
     this.directionalLightHelper = new THREE.DirectionalLightHelper(this.directionalLight, 3);
-    this.scene.add(this.directionalLightHelper);
+    //this.scene.add(this.directionalLightHelper);
 
     // Handle window resizes
     window.addEventListener('resize', () => this.onWindowResize(), false);
