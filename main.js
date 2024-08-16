@@ -13,7 +13,6 @@ import Ocean from './src/ocean';
 import SubmarineControls from './src/SubmarineControls';
 
 
-
 /* Init gui */
 const gui = new GUI({ width: 350 });
 
@@ -38,14 +37,15 @@ sceneTexture.encoding = THREE.sRGBEncoding;
 
 const sceneLoader2 = new THREE.CubeTextureLoader();
 const sceneTexture2 = sceneLoader2.load([
-    './resources/textures/underwater_skybox/side.jpg',
-    './resources/textures/underwater_skybox/side.jpg',
-    './resources/textures/underwater_skybox/top2.jpg',
+    './resources/textures/underwater_skybox/side.png',
+    './resources/textures/underwater_skybox/side.png',
+    './resources/textures/underwater_skybox/top.jpg',
     './resources/textures/underwater_skybox/floor.jpg',
-    './resources/textures/underwater_skybox/side.jpg',
-    './resources/textures/underwater_skybox/side.jpg',
+    './resources/textures/underwater_skybox/side.png',
+    './resources/textures/underwater_skybox/side.png',
 ]);
 sceneTexture2.encoding = THREE.sRGBEncoding;
+sceneManager.scene.background = sceneTexture2;
 
 /* OrbitControls */
 const orbitControls = new OrbitControls(sceneManager.camera, sceneManager.getRendererDom());
@@ -336,7 +336,6 @@ let cube6bb = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
 cube6bb.setFromObject(cube6);
 sceneManager.scene.add(cube6);
 listOfBoxes.push(cube6bb);
-console.log(listOfBoxes);
 
 
 /* Collision */
@@ -484,7 +483,6 @@ function calcPhysics() {
     console.log(acceleration);
     console.log(velocity);
     console.log(positionCoordinates);
-    console.log(sceneManager.camera.position);
 
     moveSubmarine(startPosition, startVelocity, acceleration, velocity, positionCoordinates);
 }
@@ -543,6 +541,7 @@ function moveSubmarine(sPos, sV, a, v, x) {
     let i = physics.getTime();
     let k = physics.getTime();
     let l = 0;
+    let m = 1;
 
 
     function rotate() {
@@ -554,20 +553,26 @@ function moveSubmarine(sPos, sV, a, v, x) {
                         if (Math.ceil(startRadXZ0) == Math.ceil(startRadXZ1 + Math.PI)) {
                             j = 10;
                             i = 0;
+                            m = 0;
                         }
                         if (Math.ceil(startRadXZ0) != Math.ceil(startRadXZ1)) {
                             submarine.rotateY(angleRad);
                             j += 0.01;
-                            if (j >= 10 - 0.01) {
+                            if (j > 4.9 && j < 5.1) {
                                 i = 0;
+                            }
+                            if (j >= 10 - 0.01) {
+                                m = 0;
                             }
                         } else {
                             j = 10;
                             i = 0;
+                            m = 0;
                         }
                     } else {
                         j = 10;
                         i = 0;
+                        m = 0;
                     }
                 }
             } else {
@@ -576,28 +581,35 @@ function moveSubmarine(sPos, sV, a, v, x) {
                         if (Math.ceil(startRadXZ0) == Math.ceil(startRadXZ1 + Math.PI)) {
                             j = 10;
                             i = 0;
+                            m = 0;
                         }
                         if (Math.ceil(startRadXZ0) != Math.ceil(startRadXZ1)) {
                             submarine.rotateY(angleRad);
                             j += 0.01;
-                            if (j >= 10 - 0.01) {
+                            if (j > 4.9 && j < 5.1) {
                                 i = 0;
+                            }
+                            if (j >= 10 - 0.01) {
+                                m = 0;
                             }
                         } else {
                             j = 10;
                             i = 0;
+                            m = 0;
                         }
                     } else {
                         j = 10;
                         i = 0;
+                        m = 0;
                     }
                 }
             }
         } else {
             j = 11;
+            m = 0;
         }
 
-        if (i <= 0) {
+        if (m <= 0) {
             cancelAnimationFrame(RotationAnimation);
         }
     }
@@ -643,7 +655,6 @@ function moveSubmarine(sPos, sV, a, v, x) {
                             submarine.setPositionY(submarine.getPosition().y += stepy);
                             if (i > physics.getTime() * 0.2 && i < physics.getTime() * 0.6) {
                                 submarine.rotateX(angleRad2);
-                                submarine.rotateX(angleRad2);
                             }
                             else if (i > physics.getTime() * 0.59 & i < physics.getTime() * 0.61) {
                                 k = 0;
@@ -655,12 +666,13 @@ function moveSubmarine(sPos, sV, a, v, x) {
                         if (submarine.getPosition().y < x.y) {
                             submarine.setPositionY(submarine.getPosition().y += stepy);
                             if (i > 0 && i < physics.getTime() * 0.4) {
-                                submarine.rotateX(angleRad2);
-                                submarine.rotateX(angleRad2);
+                                submarine.rotateX(-angleRad2);
                             }
                             else if (i > physics.getTime() * 0.39 & i < physics.getTime() * 0.41) {
                                 k = 0;
                             }
+                        } else {
+                            submarine.setPositionY(submarine.getPosition().y -= stepy);
                         }
                     } else { }
                 }
@@ -685,13 +697,18 @@ function moveSubmarine(sPos, sV, a, v, x) {
             }
 
             if (k < physics.getTime() * 0.4) {
-                submarine.rotateX(-angleRad2);
-                submarine.rotateX(-angleRad2);
-                k += 0.01;
+                if (sPos.y < x.y) {
+                    submarine.rotateX(angleRad2);
+                    k += 0.01;
+                } else {
+                    submarine.rotateX(-angleRad2);
+                    k += 0.01;
+                }
             }
         } else {
             i = physics.getTime();
             k = physics.getTime();
+            l = physics.getTime();
         }
 
         if (l >= physics.getTime()) {
@@ -715,7 +732,7 @@ document.addEventListener('keydown', (event) => {
 
 document.addEventListener('keyup', (event) => {
     (keysPressed)[event.key.toLowerCase()] = false
-    if(keysPressed['w']) {}
+    if (keysPressed['w']) { }
     else {
         submarineControls.speed = 20;
     }
@@ -725,7 +742,6 @@ document.addEventListener('keyup', (event) => {
 /* Ocean */
 const ocean = new Ocean(sceneManager.clock);
 ocean.initlize(sceneManager.scene);
-console.log(ocean);
 ocean.animate();
 
 /* GUI */
@@ -860,7 +876,7 @@ const clock = new THREE.Clock();
 /* Render */
 function render() {
     requestAnimationFrame(render);
-    if (submarine.position.y < 0) {
+    if (submarine.position.y < -15) {
         sceneManager.scene.background = sceneTexture2;
     } else {
         sceneManager.scene.background = sceneTexture;
