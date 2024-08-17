@@ -38,8 +38,6 @@ export default class SceneManager {
     this.directionalLight.shadow.bias = -0.001;
     this.directionalLight.shadow.mapSize.width = 2048;
     this.directionalLight.shadow.mapSize.height = 2048;
-    this.directionalLight.shadow.camera.near = 0.1;
-    this.directionalLight.shadow.camera.far = 500.0;
     this.directionalLight.shadow.camera.near = 0.5;
     this.directionalLight.shadow.camera.far = 500.0;
     this.directionalLight.shadow.camera.left = 100;

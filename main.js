@@ -63,7 +63,7 @@ orbitControls.update();
 
 /* Submarine */
 const SpeedVec = new THREE.Vector3(0, 0, 0);
-const startVelocity = new THREE.Vector3(0, 0, -1);
+const startVelocity = new THREE.Vector3(0, 0, 0);
 const submarine = new Submarine(2500000, 2800000, 73, 13, 5, 10.27, 0.04);
 
 var listOfBoxes = [];
@@ -368,6 +368,11 @@ const actions = {
 
 /* Physics */
 const physics = new Physics();
+
+var acceleration = new THREE.Vector3(0, 0, 0);
+var velocity = new THREE.Vector3(0, 0, 0);
+var positionCoordinates = new THREE.Vector3(0, 0, 0);
+
 function calcPhysics() {
     const submarine_weight = physics.Weight(submarine.mass);
     const submarine_submerged_weight = physics.Weight(submarine.mass_submerged);
@@ -404,8 +409,8 @@ function calcPhysics() {
 
     const startPosition = new THREE.Vector3(0, 0, 0);
     startPosition.set(submarine.getPosition().x, submarine.getPosition().y, submarine.getPosition().z);
+    startVelocity.set(submarine.direction.x, submarine.direction.y, submarine.direction.z);
 
-    var acceleration;
     // Action is dive
     if (actions['dive']) {
         if (submarine.getPosition().y > -1000) {
@@ -468,8 +473,8 @@ function calcPhysics() {
         }
     }
 
-    const velocity = physics.getAccerlationVelocity(startVelocity, acceleration);
-    const positionCoordinates = physics.getPosition(startPosition, velocity);
+    velocity = physics.getAccerlationVelocity(startVelocity, acceleration);
+    positionCoordinates = physics.getPosition(startPosition, velocity);
 
     // Check Coordinates
     if (positionCoordinates.y > 0) {
@@ -504,6 +509,12 @@ function moveSubmarine(sPos, sV, a, v, x) {
     var sV2 = sV.clone();
     var v2 = v.clone();
 
+    if (sV2.z == 0) {
+        sV2.z = 0.00000000000000001;
+    }
+    if (v2.z == 0) {
+        v2.z = 0.00000000000000001;
+    }
     var startRadXZ0 = Math.atan2(sV2.x, sV2.z);
     var startRadXZ1 = Math.atan2(v2.x, v2.z);
 
@@ -516,6 +527,9 @@ function moveSubmarine(sPos, sV, a, v, x) {
     // }
 
     var angleRad, angleRadXZ = startRadXZ1 - startRadXZ0;
+    if (x.z == 0) {
+        x.z = 0.00000000000000001;
+    }
     if (angleRadXZ > 3.14) {
         angleRadXZ = Math.atan(x.x / x.z) - Math.PI;
     } else if (angleRadXZ < -3.14 && sV.x <= 0 && sV.z <= 0) {
@@ -871,6 +885,10 @@ MovementFolder.add(obj, 'calcPhysics').name('Start Movement');
 /* Text */
 const textDiv = document.getElementById('text');
 
+const accelerationDiv = document.getElementById('acceleration');
+const velocityDiv = document.getElementById('velocity');
+const positionDiv = document.getElementById('position');
+
 const clock = new THREE.Clock();
 
 /* Render */
@@ -892,8 +910,14 @@ function render() {
     checkCollision();
 
     //water.material.uniforms['time'].value += 0.01;
-    textDiv.innerHTML = `X = ${submarine.position.x.toFixed(3)}, 
-Y = ${submarine.position.y.toFixed(3)}, Z = ${submarine.position.z.toFixed(3)}`
+    accelerationDiv.innerHTML = `Destination Acceleration: X =  ${acceleration.x.toFixed(3)}, 
+    Y = ${acceleration.y.toFixed(3)}, Z = ${acceleration.z.toFixed(3)}`;
+    velocityDiv.innerHTML = `Destination Velocity: X =  ${velocity.x.toFixed(3)}, 
+    Y = ${velocity.y.toFixed(3)}, Z = ${velocity.z.toFixed(3)}`;
+    positionDiv.innerHTML = `Destination Position: X = ${positionCoordinates.x.toFixed(3)}, 
+    Y = ${positionCoordinates.y.toFixed(3)}, Z = ${positionCoordinates.z.toFixed(3)}`;
+    textDiv.innerHTML = `Current Position: X = ${submarine.position.x.toFixed(3)}, 
+    Y = ${submarine.position.y.toFixed(3)}, Z = ${submarine.position.z.toFixed(3)}`;
 }
 render();
 

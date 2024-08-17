@@ -60,7 +60,7 @@ export default class SubmarineControls {
         if (keysPressed[R]) {
             this.submarine.setPositionX(0);
             this.submarine.setPositionY(0);
-            this.submarine.setPositionZ(0.85);
+            this.submarine.setPositionZ(0.167);
 
             this.orbitControl.target.set(
                 this.submarine.getPosition().x,
@@ -74,8 +74,8 @@ export default class SubmarineControls {
             );
         }
         if (keysPressed[C]) {
-            if (this.submarine.getPosition().y <= -500) {
-                this.submarine.setPositionY(this.submarine.getPosition().y = -500);
+            if (this.submarine.getPosition().y <= -1000) {
+                this.submarine.setPositionY(this.submarine.getPosition().y = -1000);
             }
             else if (this.submarine.getPosition().y > -30) {
                 this.submarine.setPositionY(this.submarine.getPosition().y -= 10 * delta);
@@ -130,7 +130,7 @@ export default class SubmarineControls {
                 this.rotateQuarternion.setFromAxisAngle(this.rotateAngle, angleYCameraDirection + directionOffset)
                 this.submarine.model.quaternion.rotateTowards(this.rotateQuarternion, 0.2)
                 this.submarine.cube.quaternion.rotateTowards(this.rotateQuarternion, 0.2)
-            } else { }
+            }
             // calculate direction
             this.camera.getWorldDirection(this.walkDirection)
             this.walkDirection.y = 0
@@ -144,10 +144,9 @@ export default class SubmarineControls {
 
             const moveX = this.walkDirection.x * this.speed * delta
             const moveZ = this.walkDirection.z * this.speed * delta
-            if (keysPressed[W] && this.speed < 100) {
+            if (keysPressed[W] || keysPressed[D] || keysPressed[A] && this.speed < 100) {
                 this.speed += 0.1;
             }
-            console.log(this.speed);
             if (!cubeCollision && !sphereCollision) {
                 this.submarine.setPositionX(this.submarine.getPosition().x += moveX)
                 this.submarine.setPositionZ(this.submarine.getPosition().z += moveZ)
@@ -188,9 +187,9 @@ export default class SubmarineControls {
                 directionOffset = Math.PI // s
             }
         } else if (keysPressed[A]) {
-            directionOffset = Math.PI / 2 // a
+            directionOffset = Math.PI / 4 // a
         } else if (keysPressed[D]) {
-            directionOffset = - Math.PI / 2 // d
+            directionOffset = - Math.PI / 4 // d
         }
         return directionOffset
     }

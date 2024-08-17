@@ -23,8 +23,7 @@ export default class Submarine {
         this.cubebb = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3());
         this.cubebb.setFromObject(this.cube);
 
-        this.steer_angle_X_Z = 0;
-        this.steer_angle_XZ_Y = 0;
+        this.direction = new THREE.Vector3(0, 0, -1);
     }
 
     getAttributes() {
@@ -75,40 +74,47 @@ export default class Submarine {
     setPosition(x, y, z) {
         this.model.position.set(x, y, z);
         this.position.set(x, y, z);
+        this.setDirection();
     }
 
     setPositionX(x) {
         this.model.position.x = x;
         this.cube.position.x = x;
         this.position.x = x;
+        this.setDirection();
     }
 
     setPositionY(y) {
         this.model.position.y = y;
         this.cube.position.y = y;
         this.position.y = y;
+        this.setDirection();
     }
 
     setPositionZ(z) {
         this.model.position.z = z;
         this.cube.position.z = z;
         this.position.z = z;
+        this.setDirection();
     }
 
 
     rotateX(angle) {
         this.model.rotateX(angle);
         this.cube.rotateX(angle);
+        this.setDirection();
     };
 
     rotateY(angle) {
         this.model.rotateY(angle);
         this.cube.rotateY(angle);
+        this.setDirection();
     };
 
     rotateZ(angle) {
         this.model.rotateZ(angle);
         this.cube.rotateZ(angle);
+        this.setDirection();
     };
 
 
@@ -118,6 +124,7 @@ export default class Submarine {
 
     setModel(model) {
         this.model = model;
+        this.setDirection();
     }
 
 
@@ -135,19 +142,13 @@ export default class Submarine {
     }
 
 
-    getSteerAngleXZ() {
-        return this.steer_angle_X_Z;
-    }
+    setDirection() {
+        // this.direction = new THREE.Vector3(0, 0, -1)
+        //     .applyQuaternion(this.model.quaternion).normalize();
+        var matrix = new THREE.Matrix4();
+        matrix.extractRotation(this.model.matrix);
 
-    setSteerAngleXZ(angle) {
-        this.steer_angle_X_Z = angle;
-    }
-
-    getSteerAngleXZY() {
-        return this.steer_angle_XZ_Y;
-    }
-
-    setSteerAngleXZY(angle) {
-        this.steer_angle_XZ_Y = angle;
+        this.direction = new THREE.Vector3(0, 0, -1)
+            .applyMatrix4(matrix).normalize();
     }
 }
