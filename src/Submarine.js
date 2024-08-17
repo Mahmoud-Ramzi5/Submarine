@@ -13,7 +13,7 @@ export default class Submarine {
         this.position = new THREE.Vector3(0, 0, 0);
         this.model = null;
         this.cube = new THREE.Mesh(
-            new THREE.BoxGeometry(5, 5, 50),
+            new THREE.BoxGeometry(3, 3, 50),
             new THREE.MeshBasicMaterial({ color: 0xff0000 })
         );
         this.cube.material.opacity = 0;

@@ -544,7 +544,7 @@ function moveSubmarine(sPos, sV, a, v, x) {
         angleRad = angleRadXZ / 1000;
     }
 
-    var angleRadYZ = Math.atan(x.y / x.z);
+    var angleRadYZ = Math.atan2(x.y, x.z);
     var angleRad2 = angleRadYZ / 2000;
 
     var stepx = v.x / 100;
